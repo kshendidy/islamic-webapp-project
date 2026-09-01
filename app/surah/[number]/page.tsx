@@ -80,7 +80,7 @@ export default function SurahPage() {
   const [isAnimating, setIsAnimating] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const VERSES_PER_PAGE = 10;
+  const VERSES_PER_PAGE = 12;
 
   const getRevealationTypeLabel = (type: string): string => {
     const lowerType = type.toLowerCase();
@@ -295,7 +295,7 @@ export default function SurahPage() {
         </section>
 
         {/* Book Pages */}
-        <section className={`mb-8 rounded-2xl border p-8 min-h-[600px] flex flex-col justify-center shadow-2xl transition-all ${darkMode ? "border-amber-900/30 bg-slate-800" : "border-amber-200 bg-gradient-to-b from-amber-50 via-yellow-50 to-white"}`} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <section className={`mb-8 rounded-2xl border px-5 py-4 min-h-[560px] flex flex-col justify-center shadow-2xl transition-all ${darkMode ? "border-amber-900/30 bg-slate-800" : "border-amber-200 bg-gradient-to-b from-amber-50 via-yellow-50 to-white"}`} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
           <div className="relative overflow-hidden" style={{ perspective: "1600px" }}>
             <div
               className="transition-all duration-500 ease-out"
@@ -318,12 +318,12 @@ export default function SurahPage() {
               <div className="space-y-0">
                 {currentPageVerses.map((ayah) => (
                   <div key={ayah.numberInSurah} className="py-0">
-                    <p className={`text-[2.1rem] leading-[1.7] font-medium text-center tracking-tight ${darkMode ? "text-slate-100" : "text-slate-900"}`} dir="rtl">
+                    <p className={`text-[1.6rem] sm:text-[1.8rem] leading-[1.65] font-medium text-center tracking-tight ${darkMode ? "text-slate-100" : "text-slate-900"}`} dir="rtl">
                       {renderAyahText(ayah)}
                     </p>
                     {ayah.tafsirText && (
-                      <div className="mt-1 text-center">
-                        <button onClick={() => setSelectedTafsir({ayahNumber: ayah.numberInSurah, tafsirText: ayah.tafsirText ?? ""})} className={`text-sm font-medium ${darkMode ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-700 hover:text-emerald-800"}`}>
+                      <div className="mt-0.5 text-center">
+                        <button onClick={() => setSelectedTafsir({ayahNumber: ayah.numberInSurah, tafsirText: ayah.tafsirText ?? ""})} className={`text-xs font-medium ${darkMode ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-700 hover:text-emerald-800"}`}>
                           📖 {currentText.tafsir}
                         </button>
                       </div>
@@ -334,10 +334,10 @@ export default function SurahPage() {
             </div>
           </div>
 
-          <div className="mt-12 pt-8 border-t border-slate-400/30 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <button onClick={handlePrevPage} disabled={currentPage === 0} className={`px-6 py-2 rounded-full font-medium ${currentPage === 0 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200")}`}>{currentText.previous}</button>
-            <span className={`text-sm font-medium ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{currentText.page} {currentPage + 1} / {totalPages}</span>
-            <button onClick={handleNextPage} disabled={currentPage === totalPages - 1} className={`px-6 py-2 rounded-full font-medium ${currentPage === totalPages - 1 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200")}`}>{currentText.next}</button>
+          <div className="mt-8 pt-4 border-t border-slate-400/30 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <button onClick={handlePrevPage} disabled={currentPage === 0} className={`px-5 py-2 rounded-full font-medium ${currentPage === 0 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200")}`}>{currentText.previous}</button>
+            <span className={`text-xs sm:text-sm font-medium ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{currentText.page} {currentPage + 1} / {totalPages}</span>
+            <button onClick={handleNextPage} disabled={currentPage === totalPages - 1} className={`px-5 py-2 rounded-full font-medium ${currentPage === totalPages - 1 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200")}`}>{currentText.next}</button>
           </div>
         </section>
 
