@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 
 type Language = "ar" | "en";
@@ -75,7 +75,10 @@ export default function SurahPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedTafsir, setSelectedTafsir] = useState<{ayahNumber: number; tafsirText: string} | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [touchStart, setTouchStart] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [pageDirection, setPageDirection] = useState<"next" | "prev" | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const VERSES_PER_PAGE = 3;
 
@@ -157,16 +160,89 @@ export default function SurahPage() {
   const currentPageVerses = pagesData[currentPage] || [];
   const totalPages = pagesData.length;
 
-  const handlePrevPage = () => setCurrentPage((p) => Math.max(0, p - 1));
-  const handleNextPage = () => setCurrentPage((p) => Math.min(totalPages - 1, p + 1));
+  const handlePrevPage = () => {
+    if (currentPage === 0) return;
+    setPageDirection("prev");
+    setIsAnimating(true);
+    window.setTimeout(() => {
+      setCurrentPage((p) => Math.max(0, p - 1));
+      setIsAnimating(false);
+      setPageDirection(null);
+    }, 180);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage >= totalPages - 1) return;
+    setPageDirection("next");
+    setIsAnimating(true);
+    window.setTimeout(() => {
+      setCurrentPage((p) => Math.min(totalPages - 1, p + 1));
+      setIsAnimating(false);
+      setPageDirection(null);
+    }, 180);
+  };
+
+  const playAyahAudio = async (ayahNumber: number) => {
+    try {
+      const response = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/ar.alafasy`);
+      if (!response.ok) return;
+
+      const result = await response.json();
+      const src = result?.data?.audio;
+      if (!src) return;
+
+      const audio = audioRef.current ?? new Audio();
+      audio.src = src;
+      audio.load();
+      audio.currentTime = 0;
+      await audio.play();
+      audioRef.current = audio;
+    } catch (error) {
+      console.error("Unable to play verse audio:", error);
+    }
+  };
+
+  const renderAyahText = (ayah: Ayah) => {
+    const words = ayah.text.trim().split(/\s+/);
+    if (words.length <= 1) {
+      return (
+        <>
+          <span>{ayah.text}</span>
+          <button type="button" onClick={() => void playAyahAudio(ayah.numberInSurah)} className={`ml-2 inline-flex h-7 w-7 items-center justify-center rounded-full border text-[10px] font-bold ${darkMode ? "border-slate-500 bg-slate-700 text-slate-100" : "border-emerald-300 bg-emerald-100 text-emerald-800"}`} aria-label={`Play verse ${ayah.numberInSurah}`}>
+            {ayah.numberInSurah}
+          </button>
+        </>
+      );
+    }
+
+    const splitIndex = Math.max(1, Math.ceil(words.length / 2));
+
+    return (
+      <>
+        {words.slice(0, splitIndex).map((word, index) => (
+          <span key={`${ayah.numberInSurah}-left-${index}`}>{word} </span>
+        ))}
+        <button type="button" onClick={() => void playAyahAudio(ayah.numberInSurah)} className={`mx-1 inline-flex h-7 w-7 items-center justify-center rounded-full border text-[10px] font-bold ${darkMode ? "border-slate-500 bg-slate-700 text-slate-100" : "border-emerald-300 bg-emerald-100 text-emerald-800"}`} aria-label={`Play verse ${ayah.numberInSurah}`}>
+          {ayah.numberInSurah}
+        </button>
+        {words.slice(splitIndex).map((word, index) => (
+          <span key={`${ayah.numberInSurah}-right-${index}`}>{` ${word}`}</span>
+        ))}
+      </>
+    );
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.touches[0].clientX);
   const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStart === null) return;
+
     const diff = touchStart - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) {
+    if (Math.abs(diff) > 60) {
       if ((diff > 0 && language === "ar") || (diff < 0 && language === "en")) handlePrevPage();
       else handleNextPage();
     }
+
+    setTouchStart(null);
   };
 
   if (!mounted || isLoading) {
@@ -220,15 +296,45 @@ export default function SurahPage() {
 
         {/* Book Pages */}
         <section className={`mb-8 rounded-2xl border p-8 min-h-[600px] flex flex-col justify-center shadow-2xl transition-all ${darkMode ? "border-amber-900/30 bg-slate-800" : "border-amber-200 bg-gradient-to-b from-amber-50 via-yellow-50 to-white"}`} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <div className="space-y-2">
-            {currentPageVerses.map((ayah) => (
-              <div key={ayah.numberInSurah} className="mb-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs ${darkMode ? "bg-slate-700 text-slate-200" : "bg-emerald-100 text-emerald-800"}`}>{ayah.numberInSurah}</span>
-                  <p className={`text-xl leading-relaxed font-medium inline ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{ayah.text}</p>
-                </div>
+          <div className="relative overflow-hidden" style={{ perspective: "1600px" }}>
+            <div
+              className="transition-all duration-500 ease-out"
+              style={
+                isAnimating
+                  ? {
+                      transform:
+                        pageDirection === "next"
+                          ? "perspective(1600px) rotateY(-8deg) translateX(12px) scale(0.99)"
+                          : "perspective(1600px) rotateY(8deg) translateX(-12px) scale(0.99)",
+                      opacity: 0.92,
+                      transformOrigin: language === "ar" ? "right center" : "left center",
+                    }
+                  : {
+                      transform: "perspective(1600px) rotateY(0deg) translateX(0px)",
+                      opacity: 1,
+                    }
+              }
+            >
+              <div className="space-y-4">
+                {currentPageVerses.map((ayah) => (
+                  <div key={ayah.numberInSurah} className="pb-2">
+                    <p className={`text-3xl leading-[2.2] font-medium text-center ${darkMode ? "text-slate-100" : "text-slate-900"}`} dir="rtl">
+                      {renderAyahText(ayah)}
+                    </p>
+                    <div className="mt-2 px-2 text-center">
+                      <p className={`text-sm leading-relaxed ${darkMode ? "text-slate-300" : "text-slate-700"}`}>{ayah.translationText || "Translation not available."}</p>
+                    </div>
+                    {ayah.tafsirText && (
+                      <div className="mt-2 text-center">
+                        <button onClick={() => setSelectedTafsir({ayahNumber: ayah.numberInSurah, tafsirText: ayah.tafsirText ?? ""})} className={`text-sm font-medium ${darkMode ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-700 hover:text-emerald-800"}`}>
+                          📖 {currentText.tafsir}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
 
           <div className="mt-12 pt-8 border-t border-slate-400/30 flex flex-col sm:flex-row items-center justify-between gap-4">
