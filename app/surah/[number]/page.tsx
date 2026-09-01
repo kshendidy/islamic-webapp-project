@@ -295,10 +295,24 @@ export default function SurahPage() {
         </section>
 
         {/* Book Pages */}
-        <section className={`mb-8 rounded-2xl border px-5 py-4 min-h-[560px] flex flex-col justify-center shadow-2xl transition-all ${darkMode ? "border-amber-900/30 bg-slate-800" : "border-amber-200 bg-gradient-to-b from-amber-50 via-yellow-50 to-white"}`} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <div className="relative overflow-hidden" style={{ perspective: "1600px" }}>
+        <section
+          className={`mb-8 rounded-[28px] border px-5 py-4 min-h-[560px] flex flex-col justify-center transition-all ${darkMode ? "border-amber-800/60 bg-slate-800" : "border-amber-300 bg-gradient-to-b from-amber-50 via-yellow-50 to-white"}`}
+          style={
+            darkMode
+              ? {
+                  boxShadow: "0 24px 80px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(251,191,36,0.18), inset 0 0 30px rgba(15,23,42,0.9)",
+                }
+              : {
+                  boxShadow: "0 26px 70px rgba(120, 84, 20, 0.18), inset 0 0 0 1px rgba(192,132,42,0.28), inset 0 0 30px rgba(255,255,255,0.8)",
+                }
+          }
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="relative overflow-hidden rounded-[22px] border border-amber-300/50" style={{ perspective: "1600px", background: darkMode ? "linear-gradient(180deg, rgba(15,23,42,0.96), rgba(30,41,59,0.98))" : "linear-gradient(180deg, rgba(255,255,255,0.62), rgba(255,248,220,0.82))" }}>
+            <div className="pointer-events-none absolute inset-0 rounded-[22px]" style={{ background: darkMode ? "linear-gradient(90deg, rgba(251,191,36,0.10), transparent 12%, transparent 88%, rgba(251,191,36,0.10)), linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))" : "linear-gradient(90deg, rgba(146,64,14,0.08), transparent 12%, transparent 88%, rgba(146,64,14,0.08)), linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1))" }} />
             <div
-              className="transition-all duration-500 ease-out"
+              className="relative transition-all duration-500 ease-out"
               style={
                 isAnimating
                   ? {
@@ -315,7 +329,7 @@ export default function SurahPage() {
                     }
               }
             >
-              <div className="space-y-0">
+              <div className="space-y-0 py-4 px-2 sm:px-3">
                 {currentPageVerses.map((ayah) => (
                   <div key={ayah.numberInSurah} className="py-0">
                     <p className={`text-[1.6rem] sm:text-[1.8rem] leading-[1.65] font-medium text-center tracking-tight ${darkMode ? "text-slate-100" : "text-slate-900"}`} dir="rtl">
