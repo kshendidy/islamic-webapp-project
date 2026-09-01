@@ -315,17 +315,17 @@ export default function SurahPage() {
                     }
               }
             >
-              <div className="space-y-4">
+              <div className="space-y-0">
                 {currentPageVerses.map((ayah) => (
-                  <div key={ayah.numberInSurah} className="pb-2">
-                    <p className={`text-3xl leading-[2.2] font-medium text-center ${darkMode ? "text-slate-100" : "text-slate-900"}`} dir="rtl">
+                  <div key={ayah.numberInSurah} className="py-0">
+                    <p className={`text-3xl leading-[1.9] font-medium text-center ${darkMode ? "text-slate-100" : "text-slate-900"}`} dir="rtl">
                       {renderAyahText(ayah)}
                     </p>
-                    <div className="mt-2 px-2 text-center">
+                    <div className="px-2 text-center">
                       <p className={`text-sm leading-relaxed ${darkMode ? "text-slate-300" : "text-slate-700"}`}>{ayah.translationText || "Translation not available."}</p>
                     </div>
                     {ayah.tafsirText && (
-                      <div className="mt-2 text-center">
+                      <div className="mt-1 text-center">
                         <button onClick={() => setSelectedTafsir({ayahNumber: ayah.numberInSurah, tafsirText: ayah.tafsirText ?? ""})} className={`text-sm font-medium ${darkMode ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-700 hover:text-emerald-800"}`}>
                           📖 {currentText.tafsir}
                         </button>
