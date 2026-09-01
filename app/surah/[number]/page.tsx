@@ -231,7 +231,7 @@ export default function SurahPage() {
               {language === "ar" ? "استماع" : "Audio"}
             </span>
           </div>
-          <audio controls className={`w-full accent-emerald-500 ${darkMode ? "bg-slate-700" : ""}`} src={`https://everyayah.com/data/Alafasy_128kbps/${String(surahNumber).padStart(3, "0")}.mp3`} />
+          <audio controls className={`w-full accent-emerald-500 ${darkMode ? "bg-slate-700" : ""}`} src={`https://qurankarem.com/reciter/full/${surahNumber}/ar.mp3`} />
         </section>
 
         <section className="space-y-6">
