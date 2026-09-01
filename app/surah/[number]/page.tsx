@@ -70,8 +70,9 @@ export default function SurahPage() {
   const [mounted, setMounted] = useState(false);
 
   const getRevealationTypeLabel = (type: string): string => {
-    if (type.toLowerCase().includes("makki")) return language === "ar" ? copy.ar.makki : copy.en.makki;
-    if (type.toLowerCase().includes("madani")) return language === "ar" ? copy.ar.madani : copy.en.madani;
+    const lowerType = type.toLowerCase();
+    if (lowerType.includes("makki") || lowerType.includes("meccan")) return language === "ar" ? copy.ar.makki : copy.en.makki;
+    if (lowerType.includes("madani") || lowerType.includes("medinan")) return language === "ar" ? copy.ar.madani : copy.en.madani;
     return type;
   };
 
