@@ -266,7 +266,7 @@ export default function SurahPage() {
   }
 
   return (
-    <main dir={direction} className={`min-h-screen pb-8 ${darkMode ? "bg-slate-900" : "bg-gradient-to-br from-amber-50 to-blue-50"}`}>
+    <main dir={direction} className="min-h-screen pb-8 bg-transparent">
       {/* Header */}
       <div className={`sticky top-0 z-50 border-b backdrop-blur ${darkMode ? "border-slate-700 bg-slate-800/95" : "border-slate-200 bg-white/95"}`}>
         <div className="max-w-4xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex justify-between items-center gap-3">

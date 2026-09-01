@@ -225,7 +225,7 @@ export default function Home() {
   };
 
   return (
-    <main dir={direction} className={`min-h-screen text-slate-900 transition-colors duration-200 ${darkMode ? "bg-slate-900" : "bg-[radial-gradient(circle_at_top,_#f4efe6,_#f7f3ea_35%,_#f1f5f9_100%)]"} ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
+    <main dir={direction} className={`min-h-screen text-slate-900 transition-colors duration-200 bg-transparent ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <header className={`mb-8 rounded-[28px] border shadow-lg backdrop-blur-sm transition-colors duration-200 p-7 ${darkMode ? "border-slate-700 bg-slate-800/70 shadow-slate-900/20" : "border-emerald-900/10 bg-white/70 shadow-emerald-950/5"}`}>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
