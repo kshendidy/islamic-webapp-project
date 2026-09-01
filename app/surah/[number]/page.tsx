@@ -80,7 +80,7 @@ export default function SurahPage() {
   const [isAnimating, setIsAnimating] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const VERSES_PER_PAGE = 9;
+  const VERSES_PER_PAGE = 10;
 
   const getRevealationTypeLabel = (type: string): string => {
     const lowerType = type.toLowerCase();
@@ -318,12 +318,9 @@ export default function SurahPage() {
               <div className="space-y-0">
                 {currentPageVerses.map((ayah) => (
                   <div key={ayah.numberInSurah} className="py-0">
-                    <p className={`text-3xl leading-[1.9] font-medium text-center ${darkMode ? "text-slate-100" : "text-slate-900"}`} dir="rtl">
+                    <p className={`text-[2.1rem] leading-[1.7] font-medium text-center tracking-tight ${darkMode ? "text-slate-100" : "text-slate-900"}`} dir="rtl">
                       {renderAyahText(ayah)}
                     </p>
-                    <div className="px-2 text-center">
-                      <p className={`text-sm leading-relaxed ${darkMode ? "text-slate-300" : "text-slate-700"}`}>{ayah.translationText || "Translation not available."}</p>
-                    </div>
                     {ayah.tafsirText && (
                       <div className="mt-1 text-center">
                         <button onClick={() => setSelectedTafsir({ayahNumber: ayah.numberInSurah, tafsirText: ayah.tafsirText ?? ""})} className={`text-sm font-medium ${darkMode ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-700 hover:text-emerald-800"}`}>
