@@ -108,6 +108,7 @@ const normalizeSurah = (surah: any): Surah => ({
 export default function Home() {
   const [language, setLanguage] = useState<Language>("ar");
   const [darkMode, setDarkMode] = useState(false);
+  const [surahDisplayLanguage, setSurahDisplayLanguage] = useState<Language>("ar");
   const [surahs, setSurahs] = useState<Surah[]>([]);
   const [favorites, setFavorites] = useState<number[]>([]);
   const [query, setQuery] = useState("");
@@ -129,6 +130,10 @@ export default function Home() {
     if (savedLanguage) {
       setLanguage(JSON.parse(savedLanguage));
     }
+    const savedSurahDisplayLanguage = localStorage.getItem("quran-surah-display-language");
+    if (savedSurahDisplayLanguage) {
+      setSurahDisplayLanguage(JSON.parse(savedSurahDisplayLanguage));
+    }
     setMounted(true);
   }, []);
 
@@ -139,6 +144,10 @@ export default function Home() {
   useEffect(() => {
     setSelectedSurah(copy[language].allSurahs);
   }, [language]);
+
+  useEffect(() => {
+    localStorage.setItem("quran-surah-display-language", JSON.stringify(surahDisplayLanguage));
+  }, [surahDisplayLanguage]);
 
   useEffect(() => {
     localStorage.setItem("quran-dark-mode", JSON.stringify(darkMode));
@@ -288,6 +297,14 @@ export default function Home() {
               </button>
               <button
                 type="button"
+                onClick={() => setSurahDisplayLanguage((prev) => (prev === "ar" ? "en" : "ar"))}
+                className={`rounded-full border px-4 py-2 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600" : "border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100"}`}
+                title={surahDisplayLanguage === "ar" ? "Surah in Arabic" : "Surah in English"}
+              >
+                {surahDisplayLanguage === "ar" ? "📖 AR" : "📖 EN"}
+              </button>
+              <button
+                type="button"
                 onClick={() => setDarkMode(!darkMode)}
                 className={`rounded-full border px-4 py-2 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600" : "border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100"}`}
               >
@@ -393,7 +410,7 @@ export default function Home() {
             <div className="flex flex-wrap gap-3">
               {favoriteSurahs.map((surah) => (
                 <Link key={surah.number} href={`/surah/${surah.number}`} className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600" : "border-violet-200 bg-white text-violet-800 hover:bg-violet-100"}`}>
-                  {surah.name}
+                  {surahDisplayLanguage === "ar" ? surah.name : surah.englishName}
                 </Link>
               ))}
             </div>
@@ -405,9 +422,9 @@ export default function Home() {
             <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className={`mb-2 text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-emerald-100"}`}>{currentText.featuredSurah}</p>
-                <h2 className="text-3xl font-bold md:text-4xl">{featuredSurah.name}</h2>
+                <h2 className="text-3xl font-bold md:text-4xl">{surahDisplayLanguage === "ar" ? featuredSurah.name : featuredSurah.englishName}</h2>
                 <p className={`mt-3 text-lg transition-colors duration-200 ${darkMode ? "text-slate-300" : "text-emerald-100"}`}>
-                  {featuredSurah.englishName} • {Number(featuredSurah.numberOfAyahs ?? 0).toLocaleString(locale)} {currentText.versesText}
+                  {surahDisplayLanguage === "ar" ? featuredSurah.englishName : featuredSurah.name} • {Number(featuredSurah.numberOfAyahs ?? 0).toLocaleString(locale)} {currentText.versesText}
                 </p>
               </div>
               <Link
@@ -418,14 +435,27 @@ export default function Home() {
               </Link>
             </div>
 
-            <p className="mt-7 text-right text-4xl leading-[2.5] font-medium sm:text-5xl">
-              {featuredSurah.ayahs[0]?.arabicText ?? ""}
-            </p>
-
-            <div className={`mt-7 rounded-2xl border p-6 transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-800/50" : "border-white/15 bg-black/10"}`}>
-              <p className={`text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-emerald-100"}`}>{currentText.translation}</p>
-              <p className="mt-4 text-lg leading-8">{featuredSurah.ayahs[0]?.translationText ?? ""}</p>
-            </div>
+            {surahDisplayLanguage === "ar" ? (
+              <>
+                <p className="mt-7 text-right text-4xl leading-[2.5] font-medium sm:text-5xl">
+                  {featuredSurah.ayahs[0]?.arabicText ?? ""}
+                </p>
+                <div className={`mt-7 rounded-2xl border p-6 transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-800/50" : "border-white/15 bg-black/10"}`}>
+                  <p className={`text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-emerald-100"}`}>{currentText.translation}</p>
+                  <p className="mt-4 text-lg leading-8">{featuredSurah.ayahs[0]?.translationText ?? ""}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="mt-7 text-left text-lg leading-8 font-medium">
+                  {featuredSurah.ayahs[0]?.translationText ?? ""}
+                </p>
+                <div className={`mt-7 rounded-2xl border p-6 transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-800/50" : "border-white/15 bg-black/10"}`}>
+                  <p className={`text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-emerald-100"}`}>{currentText.translation}</p>
+                  <p className="mt-4 text-right text-2xl leading-8">{featuredSurah.ayahs[0]?.arabicText ?? ""}</p>
+                </div>
+              </>
+            )}
           </section>
         ) : null}
 
@@ -441,7 +471,7 @@ export default function Home() {
                   <div className="mb-5 flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <p className={`text-xs font-semibold uppercase tracking-[0.3em] transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-emerald-700"}`}>{surah.number}</p>
-                      <h3 className={`mt-2 text-2xl font-bold leading-tight transition-colors duration-200 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{surah.name}</h3>
+                      <h3 className={`mt-2 text-2xl font-bold leading-tight transition-colors duration-200 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{surahDisplayLanguage === "ar" ? surah.name : surah.englishName}</h3>
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <button
@@ -462,7 +492,7 @@ export default function Home() {
                   </div>
 
                   <Link href={`/surah/${surah.number}`} className="block">
-                    <p className={`text-xs font-semibold uppercase tracking-wide transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>{surah.englishName}</p>
+                    <p className={`text-xs font-semibold uppercase tracking-wide transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>{surahDisplayLanguage === "ar" ? surah.englishName : surah.name}</p>
                     <p className={`mt-1 text-sm transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{surah.englishNameTranslation}</p>
                     <p className={`mt-4 text-xs uppercase tracking-[0.2em] transition-colors duration-200 ${darkMode ? "text-slate-500" : "text-slate-400"}`}>{surah.revelationType}</p>
 
@@ -472,11 +502,21 @@ export default function Home() {
                       </div>
                     )}
 
-                    <p className={`mt-5 text-right text-3xl leading-relaxed transition-colors duration-200 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
-                      {surah.ayahs[0]?.arabicText ?? ""}
-                    </p>
-
-                    <p className={`mt-5 text-sm leading-7 transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{surah.ayahs[0]?.translationText ?? ""}</p>
+                    {surahDisplayLanguage === "ar" ? (
+                      <>
+                        <p className={`mt-5 text-right text-3xl leading-relaxed transition-colors duration-200 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
+                          {surah.ayahs[0]?.arabicText ?? ""}
+                        </p>
+                        <p className={`mt-5 text-sm leading-7 transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{surah.ayahs[0]?.translationText ?? ""}</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className={`mt-5 text-sm leading-7 transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{surah.ayahs[0]?.translationText ?? ""}</p>
+                        <p className={`mt-5 text-right text-2xl leading-relaxed transition-colors duration-200 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
+                          {surah.ayahs[0]?.arabicText ?? ""}
+                        </p>
+                      </>
+                    )}
                   </Link>
                 </div>
               ))
