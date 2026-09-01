@@ -80,7 +80,7 @@ export default function SurahPage() {
   const [isAnimating, setIsAnimating] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const VERSES_PER_PAGE = 3;
+  const VERSES_PER_PAGE = 9;
 
   const getRevealationTypeLabel = (type: string): string => {
     const lowerType = type.toLowerCase();
