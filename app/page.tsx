@@ -376,22 +376,22 @@ export default function Home() {
         ) : null}
 
         {lastRead && lastRead.surahNumber ? (
-          <section className={`mb-8 rounded-[28px] border p-6 shadow-sm transition-colors duration-200 ${darkMode ? "border-emerald-700 bg-emerald-950/30" : "border-emerald-200 bg-emerald-50"}`}>
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
+          <section className={`mb-8 rounded-[28px] border p-4 sm:p-6 shadow-sm transition-colors duration-200 ${darkMode ? "border-emerald-700 bg-emerald-950/30" : "border-emerald-200 bg-emerald-50"}`}>
+            <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex-1 min-w-0">
                 <p className={`text-xs font-semibold uppercase tracking-[0.28em] ${darkMode ? "text-emerald-300" : "text-emerald-700"}`}>
                   {language === "ar" ? "استمرار القراءة" : "Continue reading"}
                 </p>
-                <h2 className={`mt-2 text-2xl font-bold ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
+                <h2 className={`mt-1 sm:mt-2 text-lg sm:text-2xl font-bold truncate ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
                   {surahs.find((surah) => surah.number === lastRead.surahNumber)?.name ?? `Surah ${lastRead.surahNumber}`}
                 </h2>
-                <p className={`mt-2 text-sm ${darkMode ? "text-slate-300" : "text-slate-600"}`}>
-                  {language === "ar" ? `تمت القراءة في الصفحة ${lastRead.page + 1}` : `Saved at page ${lastRead.page + 1}`}
+                <p className={`mt-1 sm:mt-2 text-xs sm:text-sm ${darkMode ? "text-slate-300" : "text-slate-600"}`}>
+                  {language === "ar" ? `الصفحة ${lastRead.page + 1}` : `Page ${lastRead.page + 1}`}
                 </p>
               </div>
               <Link
                 href={`/surah/${lastRead.surahNumber}`}
-                className={`rounded-full border px-5 py-3 text-sm font-semibold transition-colors duration-200 ${darkMode ? "border-emerald-600 bg-emerald-700 text-white hover:bg-emerald-600" : "border-emerald-300 bg-white text-emerald-800 hover:bg-emerald-100"}`}
+                className={`flex-shrink-0 rounded-full border px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold transition-colors duration-200 whitespace-nowrap ${darkMode ? "border-emerald-600 bg-emerald-700 text-white hover:bg-emerald-600" : "border-emerald-300 bg-white text-emerald-800 hover:bg-emerald-100"}`}
               >
                 {language === "ar" ? "متابعة" : "Resume"}
               </Link>
