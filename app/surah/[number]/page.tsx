@@ -220,21 +220,13 @@ export default function SurahPage() {
 
         {/* Book Pages */}
         <section className={`mb-8 rounded-2xl border p-8 min-h-[600px] flex flex-col justify-center shadow-2xl transition-all ${darkMode ? "border-amber-900/30 bg-slate-800" : "border-amber-200 bg-gradient-to-b from-amber-50 via-yellow-50 to-white"}`} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <div className="space-y-8">
+          <div className="space-y-2">
             {currentPageVerses.map((ayah) => (
-              <div key={ayah.numberInSurah}>
-                <div className="flex justify-center mb-4">
-                  <span className={`flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm ${darkMode ? "bg-slate-700 text-slate-200" : "bg-emerald-100 text-emerald-800"}`}>{ayah.numberInSurah}</span>
+              <div key={ayah.numberInSurah} className="mb-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs ${darkMode ? "bg-slate-700 text-slate-200" : "bg-emerald-100 text-emerald-800"}`}>{ayah.numberInSurah}</span>
+                  <p className={`text-xl leading-relaxed font-medium inline ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{ayah.text}</p>
                 </div>
-                <p className={`text-center text-4xl leading-loose font-semibold mb-6 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{ayah.text}</p>
-                <div className={`rounded-lg p-4 mb-4 ${darkMode ? "bg-slate-700/50" : "bg-emerald-50/50"}`}>
-                  <p className={`text-sm leading-relaxed ${darkMode ? "text-slate-300" : "text-slate-700"}`}>{ayah.translationText || "Translation not available."}</p>
-                </div>
-                {ayah.tafsirText && (
-                  <button onClick={() => setSelectedTafsir({ayahNumber: ayah.numberInSurah, tafsirText: ayah.tafsirText ?? ""})} className={`text-sm font-medium ${darkMode ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-700 hover:text-emerald-800"}`}>
-                    📖 {currentText.tafsir}
-                  </button>
-                )}
               </div>
             ))}
           </div>
