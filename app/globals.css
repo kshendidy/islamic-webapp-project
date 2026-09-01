@@ -23,10 +23,10 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   background:
-    radial-gradient(circle at 50% 0%, rgba(255, 247, 205, 0.9), transparent 22%),
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.88), transparent 15%),
-    radial-gradient(circle at 78% 18%, rgba(255, 255, 255, 0.8), transparent 20%),
-    linear-gradient(180deg, #edf9ff 0%, #d9f4ea 18%, #dfeecf 46%, #d5e7bb 72%, #b7d9a4 100%);
+    radial-gradient(circle at 50% 0%, rgba(255, 239, 167, 0.9), transparent 22%),
+    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.86), transparent 15%),
+    radial-gradient(circle at 75% 15%, rgba(255, 255, 255, 0.76), transparent 18%),
+    linear-gradient(180deg, #edf9ff 0%, #dff5ef 16%, #d8f0cf 40%, #cfe9b6 68%, #a7d49b 100%);
   overflow-x: hidden;
 }
 
@@ -36,25 +36,25 @@ body::before {
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(circle at 15% 18%, rgba(255, 255, 255, 0.9), transparent 18%),
-    radial-gradient(circle at 72% 12%, rgba(255, 255, 255, 0.8), transparent 20%),
-    radial-gradient(circle at 50% 24%, rgba(255, 255, 255, 0.7), transparent 22%),
-    radial-gradient(circle at 50% 100%, rgba(92, 155, 108, 0.25), transparent 35%);
+    radial-gradient(circle at 15% 18%, rgba(255, 255, 255, 0.96), transparent 18%),
+    radial-gradient(circle at 72% 12%, rgba(255, 255, 255, 0.82), transparent 20%),
+    radial-gradient(circle at 52% 22%, rgba(255, 255, 255, 0.66), transparent 24%),
+    radial-gradient(circle at 50% 100%, rgba(64, 137, 85, 0.2), transparent 34%);
 }
 
 body::after {
   content: "";
   position: fixed;
-  left: -10%;
-  right: -10%;
-  bottom: -90px;
-  height: 260px;
+  left: -8%;
+  right: -8%;
+  bottom: -110px;
+  height: 320px;
   z-index: -1;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(116, 194, 144, 0.52), transparent 50%),
-    linear-gradient(180deg, rgba(131, 198, 144, 0.28), rgba(38, 90, 60, 0.52));
+    radial-gradient(ellipse at 50% 0%, rgba(126, 201, 132, 0.58), transparent 55%),
+    linear-gradient(180deg, rgba(126, 201, 132, 0.18), rgba(48, 116, 68, 0.6));
   border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  filter: blur(10px);
+  filter: blur(12px);
 }
 
 * {
