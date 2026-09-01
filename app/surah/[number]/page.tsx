@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -38,6 +38,9 @@ const copy = {
     darkMode: "🌙 / ☀️",
     makki: "مكية",
     madani: "مدنية",
+    close: "إغلاق",
+    page: "صفحة",
+    of: "من",
   },
   en: {
     back: "Back to home",
@@ -53,6 +56,9 @@ const copy = {
     darkMode: "☀️ / 🌙",
     makki: "Meccan",
     madani: "Medinan",
+    close: "Close",
+    page: "Page",
+    of: "of",
   },
 };
 
@@ -66,8 +72,12 @@ export default function SurahPage() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [expandedTafsir, setExpandedTafsir] = useState<Set<number>>(new Set());
+  const [currentPage, setCurrentPage] = useState(0);
+  const [selectedTafsir, setSelectedTafsir] = useState<{ayahNumber: number; tafsirText: string} | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+
+  const VERSES_PER_PAGE = 3;
 
   const getRevealationTypeLabel = (type: string): string => {
     const lowerType = type.toLowerCase();
@@ -78,17 +88,11 @@ export default function SurahPage() {
 
   useEffect(() => {
     const saved = localStorage.getItem("quran-favorites");
-    if (saved) {
-      setFavorites(JSON.parse(saved));
-    }
+    if (saved) setFavorites(JSON.parse(saved));
     const savedDark = localStorage.getItem("quran-dark-mode");
-    if (savedDark) {
-      setDarkMode(JSON.parse(savedDark));
-    }
+    if (savedDark) setDarkMode(JSON.parse(savedDark));
     const savedLanguage = localStorage.getItem("quran-language");
-    if (savedLanguage) {
-      setLanguage(JSON.parse(savedLanguage));
-    }
+    if (savedLanguage) setLanguage(JSON.parse(savedLanguage));
     setMounted(true);
   }, []);
 
@@ -99,77 +103,77 @@ export default function SurahPage() {
   useEffect(() => {
     async function loadSurah() {
       try {
-        const arabicResponse = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/ar.alafasy`);
-        const englishResponse = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/en.asad`);
-        const tafsirResponse = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/ar.muyassar`);
-
-        if (!arabicResponse.ok || !englishResponse.ok) {
-          throw new Error("Surah not found.");
-        }
-
-        const [arabicData, englishData, tafsirData] = await Promise.all([
-          arabicResponse.json(),
-          englishResponse.json(),
-          tafsirResponse.ok ? tafsirResponse.json() : { data: { ayahs: [] } },
+        const [arabicResp, englishResp, tafsirResp] = await Promise.all([
+          fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/ar.alafasy`),
+          fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/en.asad`),
+          fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/ar.muyassar`),
         ]);
 
-        const arabic = arabicData.data;
-        const english = englishData.data;
-        const tafsir = tafsirData.data || {};
+        if (!arabicResp.ok || !englishResp.ok) throw new Error("Not found");
 
-        const ayahs = (arabic.ayahs ?? []).map((ayah: any, index: number) => ({
-          numberInSurah: Number(ayah.numberInSurah ?? index + 1),
+        const arabic = (await arabicResp.json()).data;
+        const english = (await englishResp.json()).data;
+        const tafsir = tafsirResp.ok ? (await tafsirResp.json()).data : {};
+
+        const ayahs = (arabic.ayahs ?? []).map((ayah: any, i: number) => ({
+          numberInSurah: Number(ayah.numberInSurah ?? i + 1),
           text: ayah.text ?? "",
-          translationText: english.ayahs?.[index]?.text ?? "",
-          tafsirText: tafsir.ayahs?.[index]?.text ?? "",
+          translationText: english.ayahs?.[i]?.text ?? "",
+          tafsirText: tafsir.ayahs?.[i]?.text ?? "",
         }));
 
         setSurah({
-          number: Number(arabic.number ?? surahNumber),
+          number: surahNumber,
           name: arabic.name ?? "",
           englishName: arabic.englishName ?? "",
           englishNameTranslation: arabic.englishNameTranslation ?? "",
-          numberOfAyahs: Number(arabic.numberOfAyahs ?? ayahs.length ?? 0),
+          numberOfAyahs: ayahs.length,
           revelationType: arabic.revelationType ?? "",
           ayahs,
         });
-      } catch {
+        setCurrentPage(0);
+      } catch (e) {
         setError(language === "ar" ? copy.ar.notFound : copy.en.notFound);
       } finally {
         setIsLoading(false);
       }
     }
-
     loadSurah();
   }, [language, surahNumber]);
 
   const direction = language === "ar" ? "rtl" : "ltr";
   const currentText = copy[language];
-  const prevSurah = useMemo(() => Math.max(1, surahNumber - 1), [surahNumber]);
-  const nextSurah = useMemo(() => Math.min(114, surahNumber + 1), [surahNumber]);
   const isFavorite = favorites.includes(surahNumber);
 
-  const toggleFavorite = () => {
-    const next = isFavorite ? favorites.filter((item) => item !== surahNumber) : [...favorites, surahNumber];
-    setFavorites(next);
-    localStorage.setItem("quran-favorites", JSON.stringify(next));
-  };
-
-  const toggleTafsir = (ayahNumber: number) => {
-    const next = new Set(expandedTafsir);
-    if (next.has(ayahNumber)) {
-      next.delete(ayahNumber);
-    } else {
-      next.add(ayahNumber);
+  const pagesData = useMemo(() => {
+    if (!surah) return [];
+    const pages = [];
+    for (let i = 0; i < surah.ayahs.length; i += VERSES_PER_PAGE) {
+      pages.push(surah.ayahs.slice(i, i + VERSES_PER_PAGE));
     }
-    setExpandedTafsir(next);
+    return pages;
+  }, [surah]);
+
+  const currentPageVerses = pagesData[currentPage] || [];
+  const totalPages = pagesData.length;
+
+  const handlePrevPage = () => setCurrentPage((p) => Math.max(0, p - 1));
+  const handleNextPage = () => setCurrentPage((p) => Math.min(totalPages - 1, p + 1));
+
+  const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.touches[0].clientX);
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const diff = touchStart - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      if ((diff > 0 && language === "ar") || (diff < 0 && language === "en")) handlePrevPage();
+      else handleNextPage();
+    }
   };
 
   if (!mounted || isLoading) {
     return (
-      <main dir={direction} className={`min-h-screen px-4 py-10 transition-colors duration-200 ${darkMode ? "bg-slate-900 text-slate-100" : "bg-slate-50 text-slate-800"}`}>
-        <div className={`mx-auto max-w-5xl rounded-[24px] border p-10 text-center shadow-sm transition-colors duration-200 ${darkMode ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-white"}`}>
-          {currentText.loading}
+      <main dir={direction} className={`min-h-screen flex items-center justify-center px-4 ${darkMode ? "bg-slate-900" : "bg-gradient-to-br from-amber-50 to-blue-50"}`}>
+        <div className={`text-center p-8 rounded-2xl border ${darkMode ? "border-slate-700 bg-slate-800 text-slate-100" : "border-slate-200 bg-white"}`}>
+          <p className="text-lg font-medium">{currentText.loading}</p>
         </div>
       </main>
     );
@@ -177,127 +181,97 @@ export default function SurahPage() {
 
   if (error || !surah) {
     return (
-      <main dir={direction} className={`min-h-screen px-4 py-10 transition-colors duration-200 ${darkMode ? "bg-slate-900 text-slate-100" : "bg-slate-50 text-slate-800"}`}>
-        <div className={`mx-auto max-w-3xl rounded-[24px] border p-10 text-center shadow-sm transition-colors duration-200 ${darkMode ? "border-red-900 bg-red-950 text-red-200" : "border-red-200 bg-red-50 text-red-700"}`}>
-          {error || currentText.unavailable}
+      <main dir={direction} className={`min-h-screen flex items-center justify-center px-4 ${darkMode ? "bg-slate-900" : "bg-gradient-to-br from-amber-50 to-blue-50"}`}>
+        <div className={`text-center p-8 rounded-2xl border ${darkMode ? "border-red-900 bg-red-950 text-red-200" : "border-red-200 bg-red-50"}`}>
+          <p>{error}</p>
         </div>
       </main>
     );
   }
 
   return (
-    <main dir={direction} className={`min-h-screen transition-colors duration-200 ${darkMode ? "bg-slate-900 text-slate-100" : "bg-[radial-gradient(circle_at_top,_#f4efe6,_#f7f3ea_35%,_#f1f5f9_100%)] text-slate-900"}`}>
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <Link href="/" className={`rounded-full border px-4 py-2 text-sm font-medium shadow-sm transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-700 hover:border-emerald-200"}`}>
-              {language === "ar" ? "←" : "←"} {currentText.back}
-            </Link>
-            <Link href={`/surah/${prevSurah}`} className={`rounded-full border px-4 py-2 text-sm font-medium shadow-sm transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-700 hover:border-emerald-200"}`}>
-              {currentText.previous}
-            </Link>
-            <Link href={`/surah/${nextSurah}`} className={`rounded-full border px-4 py-2 text-sm font-medium shadow-sm transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700" : "border-slate-200 bg-white text-slate-700 hover:border-emerald-200"}`}>
-              {currentText.next}
-            </Link>
+    <main dir={direction} className={`min-h-screen pb-8 ${darkMode ? "bg-slate-900" : "bg-gradient-to-br from-amber-50 to-blue-50"}`}>
+      {/* Header */}
+      <div className={`sticky top-0 z-50 border-b backdrop-blur ${darkMode ? "border-slate-700 bg-slate-800/95" : "border-slate-200 bg-white/95"}`}>
+        <div className="max-w-4xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex justify-between items-center gap-3">
+          <Link href="/" className={`rounded-full border px-3 py-2 text-sm font-medium ${darkMode ? "border-slate-600 bg-slate-700 hover:bg-slate-600 text-slate-200" : "border-slate-200 bg-white hover:bg-gray-50 text-slate-700"}`}>
+            ← {currentText.back}
+          </Link>
+          <div className="flex gap-2">
+            <button onClick={() => setLanguage((l) => (l === "ar" ? "en" : "ar"))} className={`rounded-full border px-3 py-2 text-sm font-medium ${darkMode ? "border-slate-600 bg-slate-700 hover:bg-slate-600 text-slate-200" : "border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800"}`}>{currentText.language}</button>
+            <button onClick={() => setDarkMode(!darkMode)} className={`rounded-full border px-3 py-2 text-sm font-medium ${darkMode ? "border-slate-600 bg-slate-700 hover:bg-slate-600 text-slate-200" : "border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-800"}`}>{currentText.darkMode}</button>
           </div>
-
-          <button
-            type="button"
-            onClick={() => setLanguage((prev) => (prev === "ar" ? "en" : "ar"))}
-            className={`rounded-full border px-4 py-2 text-sm font-medium shadow-sm transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700" : "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"}`}
-          >
-            {currentText.language}
-          </button>
-          <button
-            type="button"
-            onClick={() => setDarkMode(!darkMode)}
-            className={`rounded-full border px-4 py-2 text-sm font-medium shadow-sm transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700" : "border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100"}`}
-          >
-            {currentText.darkMode}
-          </button>
         </div>
-
-        <section className={`mb-8 rounded-[28px] border p-7 text-white shadow-xl transition-colors duration-200 ${darkMode ? "border-slate-700 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 shadow-slate-900/40" : "border-emerald-200 bg-gradient-to-r from-emerald-900 via-emerald-800 to-green-800 shadow-emerald-950/20"}`}>
-          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className={`text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-emerald-100"}`}>
-                {language === "ar" ? "سورة" : "Surah"} {surah.number}
-              </p>
-              <h1 className="mt-3 text-4xl font-black md:text-5xl">{surah.name}</h1>
-              <p className={`mt-3 text-lg transition-colors duration-200 ${darkMode ? "text-slate-300" : "text-emerald-100"}`}>
-                {surah.englishName} • {surah.englishNameTranslation}
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <div className={`rounded-full border px-4 py-3 text-sm font-medium transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200" : "border-white/20 bg-white/10 text-emerald-50"}`}>
-                {Number(surah.numberOfAyahs ?? 0).toLocaleString(language === "ar" ? "ar-EG" : "en-US")} {currentText.verses} • {getRevealationTypeLabel(surah.revelationType)}
-              </div>
-              <button
-                type="button"
-                onClick={toggleFavorite}
-                className={`rounded-full border px-4 py-3 text-sm font-medium transition-colors duration-200 whitespace-nowrap ${darkMode ? "border-slate-600 bg-slate-700 hover:bg-slate-600" : "border-white/20 bg-white/10 hover:bg-white/15"}`}
-              >
-                {isFavorite ? "★ في المفضلة" : "☆ إضافة للمفضلة"}
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className={`mb-6 rounded-[24px] border p-6 shadow-sm transition-colors duration-200 ${darkMode ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-white"}`}>
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className={`text-xl font-bold transition-colors duration-200 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{language === "ar" ? "المسموعات" : "Recitation"}</h2>
-            <span className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${darkMode ? "bg-slate-700 text-slate-200" : "bg-emerald-100 text-emerald-800"}`}>
-              {language === "ar" ? "استماع" : "Audio"}
-            </span>
-          </div>
-          <audio controls className={`w-full accent-emerald-500 ${darkMode ? "bg-slate-700" : ""}`} src={`https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`} />
-        </section>
-
-        <section className="space-y-6">
-          {surah.ayahs.map((ayah) => (
-            <article key={ayah.numberInSurah} className={`rounded-[24px] border p-6 shadow-sm transition-colors duration-200 ${darkMode ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-white"}`}>
-              <div className="mb-5 flex items-center justify-start">
-                <span className={`rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition-colors duration-200 ${darkMode ? "bg-slate-700 text-slate-300" : "bg-slate-100 text-slate-600"}`}>
-                  {surah.number}:{ayah.numberInSurah}
-                </span>
-              </div>
-
-              <p className={`text-right text-4xl leading-[2.5] sm:text-5xl transition-colors duration-200 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{ayah.text}</p>
-
-              <div className={`mt-6 rounded-2xl p-6 transition-colors duration-200 ${darkMode ? "bg-slate-700" : "bg-slate-50"}`}>
-                <p className={`mb-3 text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>{currentText.translation}</p>
-                <p className={`text-base leading-8 transition-colors duration-200 ${darkMode ? "text-slate-300" : "text-slate-700"}`}>{ayah.translationText || "Translation not available."}</p>
-              </div>
-
-              {ayah.tafsirText && (
-                <div className="mt-4 space-y-3">
-                  <button
-                    type="button"
-                    onClick={() => toggleTafsir(ayah.numberInSurah)}
-                    className={`flex w-full items-center justify-between rounded-2xl px-6 py-4 text-sm font-semibold transition-all duration-200 ${
-                      expandedTafsir.has(ayah.numberInSurah)
-                        ? darkMode
-                          ? "bg-emerald-900/30 text-emerald-300"
-                          : "bg-emerald-100 text-emerald-800"
-                        : darkMode
-                          ? "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                    }`}
-                  >
-                    <span className="uppercase tracking-widest">{currentText.tafsir}</span>
-                    <span className={`text-lg transition-transform duration-200 ${expandedTafsir.has(ayah.numberInSurah) ? "rotate-180" : ""}`}>▼</span>
-                  </button>
-                  {expandedTafsir.has(ayah.numberInSurah) && (
-                    <div className={`rounded-2xl p-6 transition-colors duration-200 ${darkMode ? "bg-slate-700" : "bg-slate-50"}`}>
-                      <p className={`text-right text-base leading-8 transition-colors duration-200 ${darkMode ? "text-slate-300" : "text-slate-700"}`}>{ayah.tafsirText}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </article>
-          ))}
-        </section>
       </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        {/* Title */}
+        <section className={`mb-8 rounded-2xl border p-6 text-center ${darkMode ? "border-slate-700 bg-slate-800" : "border-amber-200 bg-gradient-to-b from-amber-50 to-yellow-50"}`}>
+          <p className={`text-sm font-semibold uppercase tracking-widest mb-2 ${darkMode ? "text-slate-400" : "text-emerald-700"}`}>{language === "ar" ? "سورة" : "Surah"} {surah.number}</p>
+          <h1 className={`text-5xl font-bold mb-3 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{surah.name}</h1>
+          <p className={`text-lg ${darkMode ? "text-slate-300" : "text-slate-700"}`}>{surah.englishName}</p>
+          <p className={`text-sm mt-2 ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{surah.englishNameTranslation} • {getRevealationTypeLabel(surah.revelationType)}</p>
+        </section>
+
+        {/* Audio */}
+        <section className={`mb-8 rounded-2xl border p-6 ${darkMode ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-white"}`}>
+          <audio controls className="w-full" src={`https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`} />
+        </section>
+
+        {/* Book Pages */}
+        <section className={`mb-8 rounded-2xl border p-8 min-h-[600px] flex flex-col justify-center shadow-2xl transition-all ${darkMode ? "border-amber-900/30 bg-slate-800" : "border-amber-200 bg-gradient-to-b from-amber-50 via-yellow-50 to-white"}`} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+          <div className="space-y-8">
+            {currentPageVerses.map((ayah) => (
+              <div key={ayah.numberInSurah}>
+                <div className="flex justify-center mb-4">
+                  <span className={`flex items-center justify-center w-10 h-10 rounded-full font-bold text-sm ${darkMode ? "bg-slate-700 text-slate-200" : "bg-emerald-100 text-emerald-800"}`}>{ayah.numberInSurah}</span>
+                </div>
+                <p className={`text-center text-4xl leading-loose font-semibold mb-6 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{ayah.text}</p>
+                <div className={`rounded-lg p-4 mb-4 ${darkMode ? "bg-slate-700/50" : "bg-emerald-50/50"}`}>
+                  <p className={`text-sm leading-relaxed ${darkMode ? "text-slate-300" : "text-slate-700"}`}>{ayah.translationText || "Translation not available."}</p>
+                </div>
+                {ayah.tafsirText && (
+                  <button onClick={() => setSelectedTafsir({ayahNumber: ayah.numberInSurah, tafsirText: ayah.tafsirText})} className={`text-sm font-medium ${darkMode ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-700 hover:text-emerald-800"}`}>
+                    📖 {currentText.tafsir}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 pt-8 border-t border-slate-400/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <button onClick={handlePrevPage} disabled={currentPage === 0} className={`px-6 py-2 rounded-full font-medium ${currentPage === 0 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200")}`}>{currentText.previous}</button>
+            <span className={`text-sm font-medium ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{currentText.page} {currentPage + 1} / {totalPages}</span>
+            <button onClick={handleNextPage} disabled={currentPage === totalPages - 1} className={`px-6 py-2 rounded-full font-medium ${currentPage === totalPages - 1 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200")}`}>{currentText.next}</button>
+          </div>
+        </section>
+
+        {/* Navigation */}
+        <div className="flex flex-wrap gap-3 justify-center">
+          <Link href={`/surah/${Math.max(1, surahNumber - 1)}`} className={`rounded-full border px-4 py-2 text-sm font-medium ${darkMode ? "border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700" : "border-slate-200 bg-white hover:bg-gray-50"}`}>← {currentText.previous}</Link>
+          <button onClick={() => {
+            const next = isFavorite ? favorites.filter((f) => f !== surahNumber) : [...favorites, surahNumber];
+            setFavorites(next);
+            localStorage.setItem("quran-favorites", JSON.stringify(next));
+          }} className={`rounded-full border px-4 py-2 text-sm font-medium ${isFavorite ? (darkMode ? "border-emerald-600 bg-emerald-700 text-white" : "border-emerald-400 bg-emerald-100 text-emerald-800") : (darkMode ? "border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700" : "border-slate-200 bg-white hover:bg-gray-50")}`}>{isFavorite ? "★" : "☆"}</button>
+          <Link href={`/surah/${Math.min(114, surahNumber + 1)}`} className={`rounded-full border px-4 py-2 text-sm font-medium ${darkMode ? "border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700" : "border-slate-200 bg-white hover:bg-gray-50"}`}>{currentText.next} →</Link>
+        </div>
+      </div>
+
+      {/* Tafsir Modal */}
+      {selectedTafsir && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className={`rounded-2xl border max-w-2xl w-full max-h-[80vh] overflow-y-auto ${darkMode ? "border-slate-700 bg-slate-800 text-slate-100" : "border-slate-200 bg-white"}`}>
+            <div className={`sticky top-0 flex items-center justify-between p-6 border-b ${darkMode ? "border-slate-700 bg-slate-750" : "border-slate-200 bg-slate-50"}`}>
+              <h2 className="text-lg font-bold">{currentText.tafsir} - {surah.number}:{selectedTafsir.ayahNumber}</h2>
+              <button onClick={() => setSelectedTafsir(null)} className="text-2xl leading-none">×</button>
+            </div>
+            <div className="p-6 text-right leading-relaxed">
+              <p>{selectedTafsir.tafsirText}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
