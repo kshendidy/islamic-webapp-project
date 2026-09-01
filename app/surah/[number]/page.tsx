@@ -36,6 +36,8 @@ const copy = {
     unavailable: "السورة غير متاحة حاليًا.",
     language: "AR / EN",
     darkMode: "🌙 / ☀️",
+    makki: "مكية",
+    madani: "مدنية",
   },
   en: {
     back: "Back to home",
@@ -49,6 +51,8 @@ const copy = {
     unavailable: "Surah not available.",
     language: "EN / AR",
     darkMode: "☀️ / 🌙",
+    makki: "Meccan",
+    madani: "Medinan",
   },
 };
 
@@ -64,6 +68,12 @@ export default function SurahPage() {
   const [error, setError] = useState("");
   const [expandedTafsir, setExpandedTafsir] = useState<Set<number>>(new Set());
   const [mounted, setMounted] = useState(false);
+
+  const getRevealationTypeLabel = (type: string): string => {
+    if (type.toLowerCase().includes("makki")) return language === "ar" ? copy.ar.makki : copy.en.makki;
+    if (type.toLowerCase().includes("madani")) return language === "ar" ? copy.ar.madani : copy.en.madani;
+    return type;
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem("quran-favorites");
@@ -211,7 +221,7 @@ export default function SurahPage() {
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <div className={`rounded-full border px-4 py-3 text-sm font-medium transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200" : "border-white/20 bg-white/10 text-emerald-50"}`}>
-                {Number(surah.numberOfAyahs ?? 0).toLocaleString(language === "ar" ? "ar-EG" : "en-US")} {currentText.verses} • {surah.revelationType}
+                {Number(surah.numberOfAyahs ?? 0).toLocaleString(language === "ar" ? "ar-EG" : "en-US")} {currentText.verses} • {getRevealationTypeLabel(surah.revelationType)}
               </div>
               <button
                 type="button"
@@ -231,7 +241,7 @@ export default function SurahPage() {
               {language === "ar" ? "استماع" : "Audio"}
             </span>
           </div>
-          <audio controls className={`w-full accent-emerald-500 ${darkMode ? "bg-slate-700" : ""}`} src={`https://www.quranaudio.com/quran/${surahNumber}/ar_ar_alafasy_128.mp3`} />
+          <audio controls className={`w-full accent-emerald-500 ${darkMode ? "bg-slate-700" : ""}`} src={`https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`} />
         </section>
 
         <section className="space-y-6">
