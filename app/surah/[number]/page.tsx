@@ -231,7 +231,7 @@ export default function SurahPage() {
                   <p className={`text-sm leading-relaxed ${darkMode ? "text-slate-300" : "text-slate-700"}`}>{ayah.translationText || "Translation not available."}</p>
                 </div>
                 {ayah.tafsirText && (
-                  <button onClick={() => setSelectedTafsir({ayahNumber: ayah.numberInSurah, tafsirText: ayah.tafsirText})} className={`text-sm font-medium ${darkMode ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-700 hover:text-emerald-800"}`}>
+                  <button onClick={() => setSelectedTafsir({ayahNumber: ayah.numberInSurah, tafsirText: ayah.tafsirText ?? ""})} className={`text-sm font-medium ${darkMode ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-700 hover:text-emerald-800"}`}>
                     📖 {currentText.tafsir}
                   </button>
                 )}
