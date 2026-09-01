@@ -125,8 +125,16 @@ export default function Home() {
     if (savedDark) {
       setDarkMode(JSON.parse(savedDark));
     }
+    const savedLanguage = localStorage.getItem("quran-language");
+    if (savedLanguage) {
+      setLanguage(JSON.parse(savedLanguage));
+    }
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("quran-language", JSON.stringify(language));
+  }, [language]);
 
   useEffect(() => {
     setSelectedSurah(copy[language].allSurahs);
