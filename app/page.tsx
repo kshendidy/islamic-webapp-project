@@ -186,6 +186,15 @@ export default function Home() {
   const locale = language === "ar" ? "ar-EG" : "en-US";
   const currentText = copy[language];
   const direction = language === "ar" ? "rtl" : "ltr";
+  const readingProgress = (() => {
+    if (typeof window === "undefined") return {} as Record<number, number>;
+    try {
+      const raw = localStorage.getItem("quran-reading-progress");
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {} as Record<number, number>;
+    }
+  })();
 
   const surahOptions = [currentText.allSurahs, ...surahs.map((surah) => surah.name)];
 
@@ -401,6 +410,12 @@ export default function Home() {
                     <p className={`text-xs font-semibold uppercase tracking-wide transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-slate-500"}`}>{surah.englishName}</p>
                     <p className={`mt-1 text-sm transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{surah.englishNameTranslation}</p>
                     <p className={`mt-4 text-xs uppercase tracking-[0.2em] transition-colors duration-200 ${darkMode ? "text-slate-500" : "text-slate-400"}`}>{surah.revelationType}</p>
+
+                    {Number(readingProgress[surah.number] ?? 0) > 0 && (
+                      <div className={`mt-4 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold ${darkMode ? "border-emerald-700 bg-emerald-900/30 text-emerald-200" : "border-emerald-200 bg-emerald-50 text-emerald-800"}`}>
+                        📍 {language === "ar" ? `استئناف ${Number(readingProgress[surah.number] ?? 0) + 1}` : `Resume ${Number(readingProgress[surah.number] ?? 0) + 1}`}
+                      </div>
+                    )}
 
                     <p className={`mt-5 text-right text-3xl leading-relaxed transition-colors duration-200 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
                       {surah.ayahs[0]?.arabicText ?? ""}

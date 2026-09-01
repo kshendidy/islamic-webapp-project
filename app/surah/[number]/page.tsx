@@ -79,8 +79,19 @@ export default function SurahPage() {
   const [pageDirection, setPageDirection] = useState<"next" | "prev" | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const readingProgressKey = "quran-reading-progress";
 
   const VERSES_PER_PAGE = 12;
+
+  const getReadingProgress = () => {
+    if (typeof window === "undefined") return {} as Record<number, number>;
+    try {
+      const raw = localStorage.getItem(readingProgressKey);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {} as Record<number, number>;
+    }
+  };
 
   const getRevealationTypeLabel = (type: string): string => {
     const lowerType = type.toLowerCase();
@@ -159,6 +170,26 @@ export default function SurahPage() {
 
   const currentPageVerses = pagesData[currentPage] || [];
   const totalPages = pagesData.length;
+  const hasReadingMarker = currentPage > 0;
+
+  useEffect(() => {
+    if (!surah || !mounted || totalPages === 0) return;
+
+    const progress = getReadingProgress();
+    const savedPage = Number(progress[surahNumber] ?? 0);
+
+    if (Number.isFinite(savedPage) && savedPage >= 0 && savedPage < totalPages) {
+      setCurrentPage(savedPage);
+    }
+  }, [mounted, surah, surahNumber, totalPages]);
+
+  useEffect(() => {
+    if (!surah || !mounted) return;
+
+    const progress = getReadingProgress();
+    progress[surahNumber] = currentPage;
+    localStorage.setItem(readingProgressKey, JSON.stringify(progress));
+  }, [currentPage, mounted, surah, surahNumber]);
 
   const handlePrevPage = () => {
     if (currentPage === 0) return;
@@ -293,6 +324,12 @@ export default function SurahPage() {
         <section className={`mb-8 rounded-2xl border p-6 ${darkMode ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-white"}`}>
           <audio controls className="w-full" src={`https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`} />
         </section>
+
+        {hasReadingMarker && (
+          <div className={`mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${darkMode ? "border-emerald-700 bg-emerald-900/30 text-emerald-200" : "border-emerald-200 bg-emerald-50 text-emerald-800"}`}>
+            📍 {language === "ar" ? `استئناف من الصفحة ${currentPage + 1}` : `Resume from page ${currentPage + 1}`}
+          </div>
+        )}
 
         {/* Book Pages */}
         <section
