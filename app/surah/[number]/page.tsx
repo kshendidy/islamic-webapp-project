@@ -80,6 +80,7 @@ export default function SurahPage() {
   const [isAnimating, setIsAnimating] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const readingProgressKey = "quran-reading-progress";
+  const lastReadKey = "quran-last-read";
 
   const VERSES_PER_PAGE = 12;
 
@@ -189,6 +190,11 @@ export default function SurahPage() {
     const progress = getReadingProgress();
     progress[surahNumber] = currentPage;
     localStorage.setItem(readingProgressKey, JSON.stringify(progress));
+    localStorage.setItem(lastReadKey, JSON.stringify({
+      surahNumber,
+      page: currentPage,
+      updatedAt: Date.now(),
+    }));
   }, [currentPage, mounted, surah, surahNumber]);
 
   const handlePrevPage = () => {
