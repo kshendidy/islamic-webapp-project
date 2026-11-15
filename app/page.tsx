@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 
 type Language = "ar" | "en";
 
@@ -48,6 +49,14 @@ const copy = {
     versesText: "آيات",
     reading: "قراءة",
     by: "بواسطة",
+    shareTitle: "شارك الموقع",
+    shareDescription: "امسح رمز QR لفتح الموقع على هاتفك ومشاركته مع الآخرين.",
+    scanQr: "امسح الرمز لزيارة الموقع",
+    copyLink: "نسخ الرابط",
+    shareLink: "مشاركة الرابط",
+    copied: "تم نسخ الرابط",
+    copyFailed: "تعذر نسخ الرابط. يمكنك نسخه يدويًا.",
+    shareFailed: "تعذرت مشاركة الرابط من هذا المتصفح.",
   },
   en: {
     title: "Quran Explorer",
@@ -74,6 +83,14 @@ const copy = {
     versesText: "verses",
     reading: "Reading",
     by: "by",
+    shareTitle: "Share this website",
+    shareDescription: "Scan this QR code to open the website on your phone and share it with others.",
+    scanQr: "Scan to visit the website",
+    copyLink: "Copy link",
+    shareLink: "Share link",
+    copied: "Link copied",
+    copyFailed: "Could not copy the link. You can copy it manually.",
+    shareFailed: "This browser could not share the link.",
   },
 };
 
@@ -116,6 +133,12 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const [shareMessage, setShareMessage] = useState("");
+
+  useEffect(() => {
+    setShareUrl(`${window.location.origin}/`);
+  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem("quran-favorites");
@@ -273,6 +296,29 @@ export default function Home() {
     localStorage.setItem("quran-favorites", JSON.stringify(next));
   };
 
+  const copyShareUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareMessage(currentText.copied);
+    } catch {
+      setShareMessage(currentText.copyFailed);
+    }
+  };
+
+  const shareWebsite = async () => {
+    if (!navigator.share) {
+      await copyShareUrl();
+      return;
+    }
+
+    try {
+      await navigator.share({ title: currentText.title, url: shareUrl });
+    } catch (shareError) {
+      if (shareError instanceof DOMException && shareError.name === "AbortError") return;
+      setShareMessage(currentText.shareFailed);
+    }
+  };
+
   return (
     <main dir={direction} className={`min-h-screen text-slate-900 transition-colors duration-200 bg-transparent ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -328,6 +374,66 @@ export default function Home() {
             </div>
           </div>
         </header>
+
+        <section
+          aria-labelledby="share-website-heading"
+          className={`mb-8 flex flex-col items-center gap-5 rounded-[28px] border p-6 shadow-sm transition-colors duration-200 sm:flex-row sm:justify-between sm:p-8 ${darkMode ? "border-amber-800 bg-slate-800/80" : "border-amber-200 bg-white/90"}`}
+        >
+          <div className="text-center sm:text-start">
+            <h2
+              id="share-website-heading"
+              className={`text-2xl font-bold ${darkMode ? "text-slate-100" : "text-amber-950"}`}
+            >
+              {currentText.shareTitle}
+            </h2>
+            <p className={`mt-2 max-w-xl leading-7 ${darkMode ? "text-slate-300" : "text-slate-600"}`}>
+              {currentText.shareDescription}
+            </p>
+            {shareUrl && (
+              <p dir="ltr" className={`mt-2 break-all text-sm ${darkMode ? "text-amber-200" : "text-amber-800"}`}>
+                {shareUrl}
+              </p>
+            )}
+            <div className="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
+              <button
+                type="button"
+                onClick={() => void copyShareUrl()}
+                disabled={!shareUrl}
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition disabled:opacity-50 ${darkMode ? "border-amber-700 bg-amber-900/50 text-amber-100 hover:bg-amber-900" : "border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"}`}
+              >
+                {currentText.copyLink}
+              </button>
+              <button
+                type="button"
+                onClick={() => void shareWebsite()}
+                disabled={!shareUrl}
+                className={`rounded-full px-4 py-2 text-sm font-semibold text-white transition disabled:opacity-50 ${darkMode ? "bg-amber-700 hover:bg-amber-600" : "bg-amber-800 hover:bg-amber-700"}`}
+              >
+                {currentText.shareLink}
+              </button>
+            </div>
+            {shareMessage && (
+              <p role="status" className={`mt-3 text-sm ${darkMode ? "text-amber-200" : "text-amber-800"}`}>
+                {shareMessage}
+              </p>
+            )}
+          </div>
+          <div className={`shrink-0 rounded-2xl p-3 ${darkMode ? "bg-white" : "border border-amber-100 bg-white shadow-sm"}`}>
+            {shareUrl ? (
+              <QRCodeSVG
+                value={shareUrl}
+                size={176}
+                level="H"
+                marginSize={2}
+                title={currentText.scanQr}
+                bgColor="#ffffff"
+                fgColor="#422006"
+              />
+            ) : (
+              <div aria-hidden="true" className="h-44 w-44 animate-pulse rounded-lg bg-amber-100" />
+            )}
+          </div>
+        </section>
 
         <section className="mb-8 grid gap-4 md:grid-cols-3">
           <div className={`rounded-2xl border p-6 shadow-sm transition-colors duration-200 ${darkMode ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-white"}`}>
