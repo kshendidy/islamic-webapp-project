@@ -123,19 +123,22 @@ export default function QuranStoriesLibrary() {
                   </p>
                 </div>
                 <div className="mt-5 border-t border-amber-100 pt-4">
-                  <a
-                    href={videoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex rounded-full bg-amber-800 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-amber-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800"
-                  >
-                    {isArabic ? "شاهد الفيديو مباشرة ▶" : "Play the video ▶"}
-                  </a>
-                  <p className="mt-2 text-xs leading-5 text-slate-500">
-                    {isArabic
-                      ? "يفتح الفيديو المختار على YouTube."
-                      : "Opens the selected video on YouTube."}
-                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      href={`/quran-stories/${story.id}`}
+                      className="inline-flex rounded-full bg-amber-800 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-amber-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800"
+                    >
+                      {isArabic ? "اقرأ القصة كاملة" : "Read the full story"}
+                    </Link>
+                    <a
+                      href={videoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex rounded-full border border-amber-300 bg-amber-50 px-5 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800"
+                    >
+                      {isArabic ? "شاهد الفيديو ▶" : "Watch video ▶"}
+                    </a>
+                  </div>
                 </div>
               </article>
             );
