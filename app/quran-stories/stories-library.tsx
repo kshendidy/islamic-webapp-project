@@ -79,15 +79,14 @@ export default function QuranStoriesLibrary() {
 
         <aside className="mb-8 rounded-2xl border border-amber-200 bg-amber-50/90 p-5 text-sm leading-7 text-amber-950">
           {isArabic
-            ? "تفتح الأزرار نتائج البحث في YouTube خارج الموقع، وليست مشغلًا داخل الصفحة. اختاروا الفيديو مع ولي الأمر، وتحققوا من مناسبته ومن عدم تصوير الأنبياء؛ نتائج البحث ليست مضمونة المحتوى أو الراوي. السرد المكتوب تلخيص تعليمي، والمرجع هو الآيات المذكورة."
-            : "Video buttons open YouTube search results outside this site; they do not play an embedded video. Choose a video with a parent and check its content and narration. Search results cannot guarantee suitable content or a male narrator. The written stories are educational summaries; the cited verses are the source."}
+            ? "يفتح كل زر فيديو مباشرًا على YouTube خارج الموقع. راجعوا الفيديو مع ولي الأمر؛ لم نتحقق من ملاءمة كل المشاهد للأطفال أو من ظهور الأنبياء أو جنس الراوي. السرد المكتوب تلخيص تعليمي، والمرجع هو الآيات المذكورة."
+            : "Each button opens a direct YouTube video outside this site. Please review it with a parent; we have not verified every scene for children, whether prophets are depicted, or the narrator's gender. The written stories are educational summaries; the cited verses are the source."}
         </aside>
 
         <div className="grid gap-5 md:grid-cols-2">
           {visibleStories.map((story, index) => {
             const title = isArabic ? story.titleAr : story.titleEn;
-            const query = `${isArabic ? story.videoQueryAr : story.videoQueryEn} ${isArabic ? "بصوت رجل" : "male narration"}`;
-            const videoUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+            const videoUrl = `https://www.youtube.com/watch?v=${story.videoId}`;
             return (
               <article
                 key={story.id}
@@ -130,12 +129,12 @@ export default function QuranStoriesLibrary() {
                     rel="noreferrer"
                     className="inline-flex rounded-full bg-amber-800 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-amber-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800"
                   >
-                    {isArabic ? "افتح فيديوهات على YouTube ▶" : "Open videos on YouTube ▶"}
+                    {isArabic ? "شاهد الفيديو مباشرة ▶" : "Play the video ▶"}
                   </a>
                   <p className="mt-2 text-xs leading-5 text-slate-500">
                     {isArabic
-                      ? "اختروا فيديو بسرد عربي مناسب للأطفال."
-                      : "Choose a video with narration suitable for children."}
+                      ? "يفتح الفيديو المختار على YouTube."
+                      : "Opens the selected video on YouTube."}
                   </p>
                 </div>
               </article>
