@@ -248,31 +248,12 @@ export default function SurahPage() {
 
   const renderAyahText = (ayah: Ayah) => {
     const displayText = surahDisplayLanguage === "ar" ? ayah.text : ayah.translationText;
-    const words = displayText.trim().split(/\s+/);
-    if (words.length <= 1) {
-      return (
-        <>
-          <span>{displayText}</span>
-          <button type="button" onClick={() => void playAyahAudio(ayah.numberInSurah)} className={`ml-2 inline-flex h-7 w-7 items-center justify-center rounded-full border text-[10px] font-bold ${darkMode ? "border-slate-500 bg-slate-700 text-slate-100" : "border-amber-300 bg-amber-100 text-amber-800"}`} aria-label={`Play verse ${ayah.numberInSurah}`}>
-            {ayah.numberInSurah}
-          </button>
-        </>
-      );
-    }
-
-    const splitIndex = Math.max(1, Math.ceil(words.length / 2));
-
     return (
       <>
-        {words.slice(0, splitIndex).map((word, index) => (
-          <span key={`${ayah.numberInSurah}-left-${index}`}>{word} </span>
-        ))}
+        <span>{displayText}</span>
         <button type="button" onClick={() => void playAyahAudio(ayah.numberInSurah)} className={`mx-1 inline-flex h-7 w-7 items-center justify-center rounded-full border text-[10px] font-bold ${darkMode ? "border-slate-500 bg-slate-700 text-slate-100" : "border-amber-300 bg-amber-100 text-amber-800"}`} aria-label={`Play verse ${ayah.numberInSurah}`}>
           {ayah.numberInSurah}
         </button>
-        {words.slice(splitIndex).map((word, index) => (
-          <span key={`${ayah.numberInSurah}-right-${index}`}>{` ${word}`}</span>
-        ))}
       </>
     );
   };
