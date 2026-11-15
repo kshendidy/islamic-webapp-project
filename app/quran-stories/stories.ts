@@ -30,7 +30,7 @@ export const quranStories: QuranStory[] = [
     summaryEn: "Nuh patiently called his people to worship Allah, but many turned away. Allah instructed him to build the Ark. Nuh and the believers boarded it, and Allah rescued them through the flood.",
     lessonAr: "نصبر على فعل الخير، ونثق بالله ونتبع هديه.",
     lessonEn: "Be patient in doing what is right, trust Allah, and follow His guidance.",
-    references: ["هود 11:25–49", "المؤمنون 23:23–30", "نوح 71:1–28"],
+    references: ["هود 11:25–49", "المؤمنون 23:23–30", "نوح 71:1–28", "العنكبوت 29:14", "القمر 54:9–15"],
     videoId: "PBnqOqjmSEU",
   },
   {
@@ -41,7 +41,7 @@ export const quranStories: QuranStory[] = [
     summaryEn: "Allah sent Hud to the powerful people of 'Ad. He called them to worship and thank Allah. Many were arrogant and rejected his warning, so Allah saved Hud and the believers, while a fierce wind came upon 'Ad.",
     lessonAr: "القوة نعمة من الله، فلا ينبغي أن تقودنا إلى الكبر.",
     lessonEn: "Strength is a gift from Allah and should never lead to arrogance.",
-    references: ["الأعراف 7:65–72", "هود 11:50–60", "الأحقاف 46:21–26"],
+    references: ["الأعراف 7:65–72", "هود 11:50–60", "الأحقاف 46:21–26", "الفجر 89:6–8", "الحاقة 69:6–8"],
     videoId: "ILJm8EdN1WY",
   },
   {
@@ -52,7 +52,7 @@ export const quranStories: QuranStory[] = [
     summaryEn: "Salih called Thamud to worship Allah, and the she-camel was given as a sign. They were told to let her graze and not harm her, but some people killed her. Allah rescued Salih and the believers.",
     lessonAr: "نحترم آيات الله ولا نؤذي خلقه.",
     lessonEn: "Respect Allah's signs and do not harm His creation.",
-    references: ["الأعراف 7:73–79", "هود 11:61–68", "الشمس 91:11–15"],
+    references: ["الأعراف 7:73–79", "هود 11:61–68", "النمل 27:45–53", "القمر 54:23–31", "الشمس 91:11–15"],
     videoId: "mBwwSMx7rCE",
   },
   {
@@ -63,7 +63,7 @@ export const quranStories: QuranStory[] = [
     summaryEn: "Ibrahim sought the truth and called his people to worship Allah alone. Allah tested him with great commands, and he remained patient and obedient. Ismail shared his trust in Allah, and together they raised the foundations of the Ka'bah and prayed for acceptance.",
     lessonAr: "الثقة بالله والطاعة والصبر من أعظم الأعمال.",
     lessonEn: "Trusting Allah, obeying Him, and being patient are among the greatest deeds.",
-    references: ["البقرة 2:124–129", "مريم 19:41–50", "الصافات 37:99–111"],
+    references: ["البقرة 2:124–129", "الأنعام 6:74–83", "هود 11:69–76", "مريم 19:41–50", "العنكبوت 29:26–27", "الأنبياء 21:51–73", "الصافات 37:99–111"],
     videoId: "wXvZTPaLeEo",
   },
   {
@@ -74,7 +74,7 @@ export const quranStories: QuranStory[] = [
     summaryEn: "Lut called his people to be mindful of Allah and leave their wrongdoing, but they persisted. Allah told Lut and his believing family to leave by night, and He rescued them.",
     lessonAr: "نختار الطاعة والخلق الحسن، ونبتعد عن إيذاء الآخرين.",
     lessonEn: "Choose obedience and good character, and never harm others.",
-    references: ["الأعراف 7:80–84", "هود 11:77–83", "الحجر 15:57–77"],
+    references: ["الأعراف 7:80–84", "هود 11:77–83", "الحجر 15:57–77", "الشعراء 26:160–175", "العنكبوت 29:28–35"],
     videoId: "oMxh9bnhYR4",
   },
   {
@@ -118,7 +118,7 @@ export const quranStories: QuranStory[] = [
     summaryEn: "Allah protected Musa as a baby and later sent him to call Pharaoh to worship Allah and free the Children of Israel. Allah supported Musa with signs, and Musa led the believers away. When Pharaoh's army pursued them, Allah parted the sea and rescued Musa and his people.",
     lessonAr: "لا نخاف من الظلم، ونتوكل على الله ونتبع الحق.",
     lessonEn: "Do not give in to oppression; trust Allah and stand with what is right.",
-    references: ["طه 20:9–79", "الشعراء 26:10–68", "القصص 28:3–46"],
+    references: ["البقرة 2:57–60", "الأعراف 7:103–160", "طه 20:9–79", "الشعراء 26:10–68", "القصص 28:3–46", "يونس 10:75–92", "المائدة 5:20–26"],
     videoId: "zci8etgyad8",
   },
   {

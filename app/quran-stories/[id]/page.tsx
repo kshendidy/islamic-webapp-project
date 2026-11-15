@@ -189,8 +189,8 @@ function StoryDetail({
           <h1 className="text-3xl font-black sm:text-4xl">{isArabic ? story.titleAr : story.titleEn}</h1>
           <p className="mt-4 leading-8 text-amber-50">
             {isArabic
-              ? "إعادة سرد مبسطة للصغار، مبنية على الآيات المذكورة دون إضافة روايات غير قرآنية."
-              : "A child-friendly retelling based on the cited Quranic verses, without adding details from non-Quranic reports."}
+              ? "سرد موسّع ومبسط للصغار، أساسه القرآن الكريم، مع ما ثبت من السنة وما يوضحه التفسير المعتبر."
+              : "An expanded, child-friendly retelling based on the Quran, supplemented by authenticated hadith and reliable tafsir."}
           </p>
         </header>
 
@@ -273,6 +273,32 @@ function StoryDetail({
               {isArabic ? story.references.join("، ") : story.references.join(", ")}
             </p>
           </section>
+          {narrative.sources && narrative.sources.length > 0 && (
+            <section className="mt-5">
+              <h2 className="text-sm font-bold text-amber-800">
+                {isArabic ? "مصادر الأحاديث والتفسير" : "Hadith and tafsir sources"}
+              </h2>
+              <ul className="mt-2 space-y-1 text-sm leading-7">
+                {narrative.sources.map((source) => (
+                  <li key={source.href}>
+                    <a
+                      href={source.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-800 underline underline-offset-2 hover:text-amber-950"
+                    >
+                      {source.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+          <aside className="mt-5 rounded-xl border border-amber-200 bg-amber-50/70 p-4 text-sm leading-7 text-slate-700">
+            {isArabic
+              ? "هذه إعادة سرد وليست نصًا قرآنيًا. القرآن هو الأصل، ولا تُضاف التفاصيل المساندة إلا إذا استندت إلى حديث صحيح أو تفسير معتبر. لا تسرد المصادر كل تفاصيل حياة كل شخصية أو ترتيب جميع الأحداث؛ لذلك لا نملأ ما سكتت عنه بتفاصيل غير موثقة."
+              : "This is a retelling, not Quranic text. The Quran is the foundation; supporting details are included only when grounded in authenticated hadith or reliable tafsir. The sources do not record every life detail or the full chronology, so unverified gaps are not filled in."}
+          </aside>
           <a
             href={videoUrl}
             target="_blank"
