@@ -319,6 +319,12 @@ export default function Home() {
               <span className={`rounded-full border px-3 py-1.5 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200" : "border-violet-200 bg-violet-50 text-violet-800"}`}>
                 {favoriteSurahs.length} مفضلة
               </span>
+              <Link
+                href="/azkar"
+                className={`rounded-full border px-4 py-2 font-semibold transition ${darkMode ? "border-emerald-700 bg-emerald-900/50 text-emerald-200 hover:bg-emerald-900" : "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"}`}
+              >
+                الأذكار
+              </Link>
             </div>
           </div>
         </header>
