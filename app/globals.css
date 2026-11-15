@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #fffbeb;
+  --foreground: #422006;
 }
 
 @theme inline {
@@ -23,10 +23,10 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   background:
-    radial-gradient(circle at 50% 0%, rgba(255, 239, 167, 0.9), transparent 22%),
-    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.86), transparent 15%),
-    radial-gradient(circle at 75% 15%, rgba(255, 255, 255, 0.76), transparent 18%),
-    linear-gradient(180deg, #edf9ff 0%, #dff5ef 16%, #d8f0cf 40%, #cfe9b6 68%, #a7d49b 100%);
+    radial-gradient(circle at 50% 0%, rgba(255, 225, 148, 0.9), transparent 24%),
+    radial-gradient(circle at 20% 18%, rgba(255, 252, 240, 0.86), transparent 15%),
+    radial-gradient(circle at 75% 15%, rgba(255, 250, 230, 0.76), transparent 18%),
+    linear-gradient(180deg, #fff8e7 0%, #f8edda 28%, #f1dfbf 62%, #e4c99c 100%);
   overflow-x: hidden;
 }
 
@@ -36,10 +36,10 @@ body::before {
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(circle at 15% 18%, rgba(255, 255, 255, 0.96), transparent 18%),
-    radial-gradient(circle at 72% 12%, rgba(255, 255, 255, 0.82), transparent 20%),
-    radial-gradient(circle at 52% 22%, rgba(255, 255, 255, 0.66), transparent 24%),
-    radial-gradient(circle at 50% 100%, rgba(64, 137, 85, 0.2), transparent 34%);
+    radial-gradient(circle at 15% 18%, rgba(255, 253, 245, 0.96), transparent 18%),
+    radial-gradient(circle at 72% 12%, rgba(255, 248, 224, 0.82), transparent 20%),
+    radial-gradient(circle at 52% 22%, rgba(255, 242, 207, 0.66), transparent 24%),
+    radial-gradient(circle at 50% 100%, rgba(146, 96, 38, 0.18), transparent 34%);
 }
 
 body::after {
@@ -51,8 +51,8 @@ body::after {
   height: 320px;
   z-index: -1;
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(126, 201, 132, 0.58), transparent 55%),
-    linear-gradient(180deg, rgba(126, 201, 132, 0.18), rgba(48, 116, 68, 0.6));
+    radial-gradient(ellipse at 50% 0%, rgba(208, 166, 93, 0.5), transparent 55%),
+    linear-gradient(180deg, rgba(208, 166, 93, 0.16), rgba(115, 72, 30, 0.48));
   border-radius: 50% 50% 0 0 / 100% 100% 0 0;
   filter: blur(12px);
 }
@@ -62,5 +62,5 @@ body::after {
 }
 
 ::selection {
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(180, 130, 55, 0.24);
 }

@@ -68,6 +68,7 @@ export default function SurahPage() {
 
   const [language, setLanguage] = useState<Language>("ar");
   const [darkMode, setDarkMode] = useState(false);
+  const [surahDisplayLanguage, setSurahDisplayLanguage] = useState<Language>("ar");
   const [surah, setSurah] = useState<SurahDetail | null>(null);
   const [favorites, setFavorites] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -108,12 +109,18 @@ export default function SurahPage() {
     if (savedDark) setDarkMode(JSON.parse(savedDark));
     const savedLanguage = localStorage.getItem("quran-language");
     if (savedLanguage) setLanguage(JSON.parse(savedLanguage));
+    const savedSurahDisplayLanguage = localStorage.getItem("quran-surah-display-language");
+    if (savedSurahDisplayLanguage) setSurahDisplayLanguage(JSON.parse(savedSurahDisplayLanguage));
     setMounted(true);
   }, []);
 
   useEffect(() => {
     localStorage.setItem("quran-language", JSON.stringify(language));
   }, [language]);
+
+  useEffect(() => {
+    localStorage.setItem("quran-surah-display-language", JSON.stringify(surahDisplayLanguage));
+  }, [surahDisplayLanguage]);
 
   useEffect(() => {
     async function loadSurah() {
@@ -240,12 +247,13 @@ export default function SurahPage() {
   };
 
   const renderAyahText = (ayah: Ayah) => {
-    const words = ayah.text.trim().split(/\s+/);
+    const displayText = surahDisplayLanguage === "ar" ? ayah.text : ayah.translationText;
+    const words = displayText.trim().split(/\s+/);
     if (words.length <= 1) {
       return (
         <>
-          <span>{ayah.text}</span>
-          <button type="button" onClick={() => void playAyahAudio(ayah.numberInSurah)} className={`ml-2 inline-flex h-7 w-7 items-center justify-center rounded-full border text-[10px] font-bold ${darkMode ? "border-slate-500 bg-slate-700 text-slate-100" : "border-emerald-300 bg-emerald-100 text-emerald-800"}`} aria-label={`Play verse ${ayah.numberInSurah}`}>
+          <span>{displayText}</span>
+          <button type="button" onClick={() => void playAyahAudio(ayah.numberInSurah)} className={`ml-2 inline-flex h-7 w-7 items-center justify-center rounded-full border text-[10px] font-bold ${darkMode ? "border-slate-500 bg-slate-700 text-slate-100" : "border-amber-300 bg-amber-100 text-amber-800"}`} aria-label={`Play verse ${ayah.numberInSurah}`}>
             {ayah.numberInSurah}
           </button>
         </>
@@ -259,7 +267,7 @@ export default function SurahPage() {
         {words.slice(0, splitIndex).map((word, index) => (
           <span key={`${ayah.numberInSurah}-left-${index}`}>{word} </span>
         ))}
-        <button type="button" onClick={() => void playAyahAudio(ayah.numberInSurah)} className={`mx-1 inline-flex h-7 w-7 items-center justify-center rounded-full border text-[10px] font-bold ${darkMode ? "border-slate-500 bg-slate-700 text-slate-100" : "border-emerald-300 bg-emerald-100 text-emerald-800"}`} aria-label={`Play verse ${ayah.numberInSurah}`}>
+        <button type="button" onClick={() => void playAyahAudio(ayah.numberInSurah)} className={`mx-1 inline-flex h-7 w-7 items-center justify-center rounded-full border text-[10px] font-bold ${darkMode ? "border-slate-500 bg-slate-700 text-slate-100" : "border-amber-300 bg-amber-100 text-amber-800"}`} aria-label={`Play verse ${ayah.numberInSurah}`}>
           {ayah.numberInSurah}
         </button>
         {words.slice(splitIndex).map((word, index) => (
@@ -284,7 +292,7 @@ export default function SurahPage() {
 
   if (!mounted || isLoading) {
     return (
-      <main dir={direction} className={`min-h-screen flex items-center justify-center px-4 ${darkMode ? "bg-slate-900" : "bg-gradient-to-br from-amber-50 to-blue-50"}`}>
+      <main dir={direction} className={`min-h-screen flex items-center justify-center px-4 ${darkMode ? "bg-slate-900" : "bg-gradient-to-br from-amber-50 to-amber-50"}`}>
         <div className={`text-center p-8 rounded-2xl border ${darkMode ? "border-slate-700 bg-slate-800 text-slate-100" : "border-slate-200 bg-white"}`}>
           <p className="text-lg font-medium">{currentText.loading}</p>
         </div>
@@ -294,7 +302,7 @@ export default function SurahPage() {
 
   if (error || !surah) {
     return (
-      <main dir={direction} className={`min-h-screen flex items-center justify-center px-4 ${darkMode ? "bg-slate-900" : "bg-gradient-to-br from-amber-50 to-blue-50"}`}>
+      <main dir={direction} className={`min-h-screen flex items-center justify-center px-4 ${darkMode ? "bg-slate-900" : "bg-gradient-to-br from-amber-50 to-amber-50"}`}>
         <div className={`text-center p-8 rounded-2xl border ${darkMode ? "border-red-900 bg-red-950 text-red-200" : "border-red-200 bg-red-50"}`}>
           <p>{error}</p>
         </div>
@@ -311,19 +319,18 @@ export default function SurahPage() {
             ← {currentText.back}
           </Link>
           <div className="flex gap-2">
-            <button onClick={() => setLanguage((l) => (l === "ar" ? "en" : "ar"))} className={`rounded-full border px-3 py-2 text-sm font-medium ${darkMode ? "border-slate-600 bg-slate-700 hover:bg-slate-600 text-slate-200" : "border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800"}`}>{currentText.language}</button>
-            <button onClick={() => setDarkMode(!darkMode)} className={`rounded-full border px-3 py-2 text-sm font-medium ${darkMode ? "border-slate-600 bg-slate-700 hover:bg-slate-600 text-slate-200" : "border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-800"}`}>{currentText.darkMode}</button>
+            <button onClick={() => setSurahDisplayLanguage((l) => (l === "ar" ? "en" : "ar"))} className={`rounded-full border px-3 py-2 text-sm font-medium ${darkMode ? "border-slate-600 bg-slate-700 hover:bg-slate-600 text-slate-200" : "border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800"}`} title={surahDisplayLanguage === "ar" ? "Show in Arabic" : "Show in English"}>📖 {surahDisplayLanguage === "ar" ? "AR" : "EN"}</button>
+            <button onClick={() => setLanguage((l) => (l === "ar" ? "en" : "ar"))} className={`rounded-full border px-3 py-2 text-sm font-medium ${darkMode ? "border-slate-600 bg-slate-700 hover:bg-slate-600 text-slate-200" : "border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800"}`}>{currentText.language}</button>
+            <button onClick={() => setDarkMode(!darkMode)} className={`rounded-full border px-3 py-2 text-sm font-medium ${darkMode ? "border-slate-600 bg-slate-700 hover:bg-slate-600 text-slate-200" : "border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800"}`}>{currentText.darkMode}</button>
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* Title */}
-        <section className={`mb-8 rounded-2xl border p-6 text-center ${darkMode ? "border-slate-700 bg-slate-800" : "border-amber-200 bg-gradient-to-b from-amber-50 to-yellow-50"}`}>
-          <p className={`text-sm font-semibold uppercase tracking-widest mb-2 ${darkMode ? "text-slate-400" : "text-emerald-700"}`}>{language === "ar" ? "سورة" : "Surah"} {surah.number}</p>
-          <h1 className={`text-5xl font-bold mb-3 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{surah.name}</h1>
-          <p className={`text-lg ${darkMode ? "text-slate-300" : "text-slate-700"}`}>{surah.englishName}</p>
-          <p className={`text-sm mt-2 ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{surah.englishNameTranslation} • {getRevealationTypeLabel(surah.revelationType)}</p>
+        <section className={`mb-8 rounded-2xl border p-6 text-center ${darkMode ? "border-slate-700 bg-slate-800" : "border-amber-200 bg-gradient-to-b from-amber-50 to-amber-50"}`}>
+          <h1 className={`text-5xl font-bold mb-3 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{surahDisplayLanguage === "ar" ? surah.name : surah.englishName}</h1>
+          <p className={`text-lg ${darkMode ? "text-slate-300" : "text-slate-700"}`}>{surahDisplayLanguage === "ar" ? surah.englishName : surah.name}</p>
         </section>
 
         {/* Audio */}
@@ -332,14 +339,14 @@ export default function SurahPage() {
         </section>
 
         {hasReadingMarker && (
-          <div className={`mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${darkMode ? "border-emerald-700 bg-emerald-900/30 text-emerald-200" : "border-emerald-200 bg-emerald-50 text-emerald-800"}`}>
+          <div className={`mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${darkMode ? "border-amber-700 bg-amber-900/30 text-amber-200" : "border-amber-200 bg-amber-50 text-amber-800"}`}>
             📍 {language === "ar" ? `استئناف من الصفحة ${currentPage + 1}` : `Resume from page ${currentPage + 1}`}
           </div>
         )}
 
         {/* Book Pages */}
         <section
-          className={`mb-8 rounded-[28px] border px-5 py-4 min-h-[560px] flex flex-col justify-center transition-all ${darkMode ? "border-amber-800/60 bg-slate-800" : "border-amber-300 bg-gradient-to-b from-amber-50 via-yellow-50 to-white"}`}
+          className={`mb-8 rounded-[28px] border px-5 py-4 min-h-[560px] flex flex-col justify-center transition-all ${darkMode ? "border-amber-800/60 bg-slate-800" : "border-amber-300 bg-gradient-to-b from-amber-50 via-amber-50 to-white"}`}
           style={
             darkMode
               ? {
@@ -371,16 +378,17 @@ export default function SurahPage() {
                       opacity: 1,
                     }
               }
+              dir={surahDisplayLanguage === "ar" ? "rtl" : "ltr"}
             >
               <div className="space-y-0 py-4 px-2 sm:px-3">
                 {currentPageVerses.map((ayah) => (
                   <div key={ayah.numberInSurah} className="py-0">
-                    <p className={`text-[1.6rem] sm:text-[1.8rem] leading-[1.65] font-medium text-center tracking-tight ${darkMode ? "text-slate-100" : "text-slate-900"}`} dir="rtl">
+                    <p className={`text-[1.6rem] sm:text-[1.8rem] leading-[1.65] font-medium text-center tracking-tight ${darkMode ? "text-slate-100" : "text-slate-900"}`} dir={surahDisplayLanguage === "ar" ? "rtl" : "ltr"}>
                       {renderAyahText(ayah)}
                     </p>
                     {ayah.tafsirText && (
                       <div className="mt-0.5 text-center">
-                        <button onClick={() => setSelectedTafsir({ayahNumber: ayah.numberInSurah, tafsirText: ayah.tafsirText ?? ""})} className={`text-xs font-medium ${darkMode ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-700 hover:text-emerald-800"}`}>
+                        <button onClick={() => setSelectedTafsir({ayahNumber: ayah.numberInSurah, tafsirText: ayah.tafsirText ?? ""})} className={`text-xs font-medium ${darkMode ? "text-amber-400 hover:text-amber-300" : "text-amber-700 hover:text-amber-800"}`}>
                           📖 {currentText.tafsir}
                         </button>
                       </div>
@@ -392,9 +400,9 @@ export default function SurahPage() {
           </div>
 
           <div className="mt-8 pt-4 border-t border-slate-400/30 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <button onClick={handlePrevPage} disabled={currentPage === 0} className={`px-5 py-2 rounded-full font-medium ${currentPage === 0 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200")}`}>{currentText.previous}</button>
+            <button onClick={handlePrevPage} disabled={currentPage === 0} className={`px-5 py-2 rounded-full font-medium ${currentPage === 0 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-amber-100 text-amber-800 hover:bg-amber-200")}`}>{currentText.previous}</button>
             <span className={`text-xs sm:text-sm font-medium ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{currentText.page} {currentPage + 1} / {totalPages}</span>
-            <button onClick={handleNextPage} disabled={currentPage === totalPages - 1} className={`px-5 py-2 rounded-full font-medium ${currentPage === totalPages - 1 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-emerald-100 text-emerald-800 hover:bg-emerald-200")}`}>{currentText.next}</button>
+            <button onClick={handleNextPage} disabled={currentPage === totalPages - 1} className={`px-5 py-2 rounded-full font-medium ${currentPage === totalPages - 1 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-amber-100 text-amber-800 hover:bg-amber-200")}`}>{currentText.next}</button>
           </div>
         </section>
 
@@ -405,7 +413,7 @@ export default function SurahPage() {
             const next = isFavorite ? favorites.filter((f) => f !== surahNumber) : [...favorites, surahNumber];
             setFavorites(next);
             localStorage.setItem("quran-favorites", JSON.stringify(next));
-          }} className={`rounded-full border px-4 py-2 text-sm font-medium ${isFavorite ? (darkMode ? "border-emerald-600 bg-emerald-700 text-white" : "border-emerald-400 bg-emerald-100 text-emerald-800") : (darkMode ? "border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700" : "border-slate-200 bg-white hover:bg-gray-50")}`}>{isFavorite ? "★" : "☆"}</button>
+          }} className={`rounded-full border px-4 py-2 text-sm font-medium ${isFavorite ? (darkMode ? "border-amber-600 bg-amber-700 text-white" : "border-amber-400 bg-amber-100 text-amber-800") : (darkMode ? "border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700" : "border-slate-200 bg-white hover:bg-gray-50")}`}>{isFavorite ? "★" : "☆"}</button>
           <Link href={`/surah/${Math.min(114, surahNumber + 1)}`} className={`rounded-full border px-4 py-2 text-sm font-medium ${darkMode ? "border-slate-600 bg-slate-800 text-slate-200 hover:bg-slate-700" : "border-slate-200 bg-white hover:bg-gray-50"}`}>{currentText.next} →</Link>
         </div>
       </div>

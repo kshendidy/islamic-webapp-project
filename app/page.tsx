@@ -276,10 +276,10 @@ export default function Home() {
   return (
     <main dir={direction} className={`min-h-screen text-slate-900 transition-colors duration-200 bg-transparent ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className={`mb-8 rounded-[28px] border shadow-lg backdrop-blur-sm transition-colors duration-200 p-7 ${darkMode ? "border-slate-700 bg-slate-800/70 shadow-slate-900/20" : "border-emerald-900/10 bg-white/70 shadow-emerald-950/5"}`}>
+        <header className={`mb-8 rounded-[28px] border shadow-lg backdrop-blur-sm transition-colors duration-200 p-7 ${darkMode ? "border-slate-700 bg-slate-800/70 shadow-slate-900/20" : "border-amber-900/10 bg-white/70 shadow-amber-950/5"}`}>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className={`mb-2 text-sm font-medium uppercase tracking-[0.28em] transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-emerald-700"}`}>
+              <p className={`mb-2 text-sm font-medium uppercase tracking-[0.28em] transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-amber-700"}`}>
                 {currentText.subtitle}
               </p>
               <h1 className={`text-4xl font-black tracking-tight sm:text-5xl transition-colors duration-200 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
@@ -291,14 +291,14 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setLanguage((prev) => (prev === "ar" ? "en" : "ar"))}
-                className={`rounded-full border px-4 py-2 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600" : "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"}`}
+                className={`rounded-full border px-4 py-2 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600" : "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"}`}
               >
                 {currentText.language}
               </button>
               <button
                 type="button"
                 onClick={() => setSurahDisplayLanguage((prev) => (prev === "ar" ? "en" : "ar"))}
-                className={`rounded-full border px-4 py-2 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600" : "border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100"}`}
+                className={`rounded-full border px-4 py-2 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600" : "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"}`}
                 title={surahDisplayLanguage === "ar" ? "Surah in Arabic" : "Surah in English"}
               >
                 {surahDisplayLanguage === "ar" ? "📖 AR" : "📖 EN"}
@@ -306,11 +306,11 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setDarkMode(!darkMode)}
-                className={`rounded-full border px-4 py-2 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600" : "border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100"}`}
+                className={`rounded-full border px-4 py-2 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600" : "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"}`}
               >
                 {currentText.darkMode}
               </button>
-              <span className={`rounded-full border px-3 py-1.5 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200" : "border-emerald-200 bg-emerald-50 text-emerald-800"}`}>
+              <span className={`rounded-full border px-3 py-1.5 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200" : "border-amber-200 bg-amber-50 text-amber-800"}`}>
                 {surahs.length.toLocaleString(locale)} {currentText.surahs}
               </span>
               <span className={`rounded-full border px-3 py-1.5 font-medium transition ${darkMode ? "border-slate-600 bg-slate-700 text-slate-200" : "border-amber-200 bg-amber-50 text-amber-800"}`}>
@@ -321,7 +321,7 @@ export default function Home() {
               </span>
               <Link
                 href="/azkar"
-                className={`rounded-full border px-4 py-2 font-semibold transition ${darkMode ? "border-emerald-700 bg-emerald-900/50 text-emerald-200 hover:bg-emerald-900" : "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"}`}
+                className={`rounded-full border px-4 py-2 font-semibold transition ${darkMode ? "border-amber-700 bg-amber-900/50 text-amber-200 hover:bg-amber-900" : "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"}`}
               >
                 الأذكار
               </Link>
@@ -352,7 +352,7 @@ export default function Home() {
 
         <section className={`mb-8 rounded-[28px] border p-6 shadow-lg backdrop-blur-sm transition-colors duration-200 ${darkMode ? "border-slate-700 bg-slate-800/80 shadow-slate-900/30" : "border-slate-200 bg-white/80 shadow-slate-200/60"}`}>
           <div className="grid gap-4 lg:grid-cols-[1.5fr_0.9fr]">
-            <label className={`flex items-center gap-3 rounded-2xl border px-4 py-3.5 transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-700 focus-within:border-blue-500 focus-within:ring-blue-900" : "border-slate-200 bg-slate-50 focus-within:border-emerald-400 focus-within:ring-emerald-100"} focus-within:ring-2`}>
+            <label className={`flex items-center gap-3 rounded-2xl border px-4 py-3.5 transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-700 focus-within:border-amber-500 focus-within:ring-amber-900" : "border-slate-200 bg-slate-50 focus-within:border-amber-400 focus-within:ring-amber-100"} focus-within:ring-2`}>
               <span className="text-xl">🔎</span>
               <input
                 type="text"
@@ -366,7 +366,7 @@ export default function Home() {
             <select
               value={selectedSurah}
               onChange={(event) => setSelectedSurah(event.target.value)}
-              className={`rounded-2xl border px-4 py-3.5 text-base transition-colors duration-200 focus:border-emerald-400 focus:outline-none ${darkMode ? "border-slate-600 bg-slate-700 text-slate-100" : "border-slate-200 bg-slate-50 text-slate-800"}`}
+              className={`rounded-2xl border px-4 py-3.5 text-base transition-colors duration-200 focus:border-amber-400 focus:outline-none ${darkMode ? "border-slate-600 bg-slate-700 text-slate-100" : "border-slate-200 bg-slate-50 text-slate-800"}`}
             >
               {surahOptions.map((surah) => (
                 <option key={surah} value={surah}>
@@ -382,10 +382,10 @@ export default function Home() {
         ) : null}
 
         {lastRead && lastRead.surahNumber ? (
-          <section className={`mb-8 rounded-[28px] border p-4 sm:p-6 shadow-sm transition-colors duration-200 ${darkMode ? "border-emerald-700 bg-emerald-950/30" : "border-emerald-200 bg-emerald-50"}`}>
+          <section className={`mb-8 rounded-[28px] border p-4 sm:p-6 shadow-sm transition-colors duration-200 ${darkMode ? "border-amber-700 bg-amber-950/30" : "border-amber-200 bg-amber-50"}`}>
             <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex-1 min-w-0">
-                <p className={`text-xs font-semibold uppercase tracking-[0.28em] ${darkMode ? "text-emerald-300" : "text-emerald-700"}`}>
+                <p className={`text-xs font-semibold uppercase tracking-[0.28em] ${darkMode ? "text-amber-300" : "text-amber-700"}`}>
                   {language === "ar" ? "استمرار القراءة" : "Continue reading"}
                 </p>
                 <h2 className={`mt-1 sm:mt-2 text-lg sm:text-2xl font-bold truncate ${darkMode ? "text-slate-100" : "text-slate-900"}`}>
@@ -397,7 +397,7 @@ export default function Home() {
               </div>
               <Link
                 href={`/surah/${lastRead.surahNumber}`}
-                className={`flex-shrink-0 rounded-full border px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold transition-colors duration-200 whitespace-nowrap ${darkMode ? "border-emerald-600 bg-emerald-700 text-white hover:bg-emerald-600" : "border-emerald-300 bg-white text-emerald-800 hover:bg-emerald-100"}`}
+                className={`flex-shrink-0 rounded-full border px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold transition-colors duration-200 whitespace-nowrap ${darkMode ? "border-amber-600 bg-amber-700 text-white hover:bg-amber-600" : "border-amber-300 bg-white text-amber-800 hover:bg-amber-100"}`}
               >
                 {language === "ar" ? "متابعة" : "Resume"}
               </Link>
@@ -424,12 +424,12 @@ export default function Home() {
         ) : null}
 
         {featuredSurah && !isLoading ? (
-          <section className={`mb-8 rounded-[28px] border p-7 text-white shadow-xl transition-colors duration-200 ${darkMode ? "border-slate-700 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 shadow-slate-900/40" : "border-emerald-200 bg-gradient-to-r from-emerald-900 via-emerald-800 to-green-800 shadow-emerald-950/20"}`}>
+          <section className={`mb-8 rounded-[28px] border p-7 text-white shadow-xl transition-colors duration-200 ${darkMode ? "border-slate-700 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 shadow-slate-900/40" : "border-amber-200 bg-gradient-to-r from-amber-900 via-amber-800 to-amber-800 shadow-amber-950/20"}`}>
             <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
               <div>
-                <p className={`mb-2 text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-emerald-100"}`}>{currentText.featuredSurah}</p>
+                <p className={`mb-2 text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-amber-100"}`}>{currentText.featuredSurah}</p>
                 <h2 className="text-3xl font-bold md:text-4xl">{surahDisplayLanguage === "ar" ? featuredSurah.name : featuredSurah.englishName}</h2>
-                <p className={`mt-3 text-lg transition-colors duration-200 ${darkMode ? "text-slate-300" : "text-emerald-100"}`}>
+                <p className={`mt-3 text-lg transition-colors duration-200 ${darkMode ? "text-slate-300" : "text-amber-100"}`}>
                   {surahDisplayLanguage === "ar" ? featuredSurah.englishName : featuredSurah.name} • {Number(featuredSurah.numberOfAyahs ?? 0).toLocaleString(locale)} {currentText.versesText}
                 </p>
               </div>
@@ -447,7 +447,7 @@ export default function Home() {
                   {featuredSurah.ayahs[0]?.arabicText ?? ""}
                 </p>
                 <div className={`mt-7 rounded-2xl border p-6 transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-800/50" : "border-white/15 bg-black/10"}`}>
-                  <p className={`text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-emerald-100"}`}>{currentText.translation}</p>
+                  <p className={`text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-amber-100"}`}>{currentText.translation}</p>
                   <p className="mt-4 text-lg leading-8">{featuredSurah.ayahs[0]?.translationText ?? ""}</p>
                 </div>
               </>
@@ -457,7 +457,7 @@ export default function Home() {
                   {featuredSurah.ayahs[0]?.translationText ?? ""}
                 </p>
                 <div className={`mt-7 rounded-2xl border p-6 transition-colors duration-200 ${darkMode ? "border-slate-600 bg-slate-800/50" : "border-white/15 bg-black/10"}`}>
-                  <p className={`text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-emerald-100"}`}>{currentText.translation}</p>
+                  <p className={`text-xs font-semibold uppercase tracking-widest transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-amber-100"}`}>{currentText.translation}</p>
                   <p className="mt-4 text-right text-2xl leading-8">{featuredSurah.ayahs[0]?.arabicText ?? ""}</p>
                 </div>
               </>
@@ -473,10 +473,10 @@ export default function Home() {
           <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {filteredSurahs.length > 0 ? (
               filteredSurahs.map((surah) => (
-                <div key={surah.number} className={`group rounded-[24px] border p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 ${darkMode ? "border-slate-700 bg-slate-800 hover:border-slate-600 hover:shadow-slate-900/50" : "border-slate-200 bg-white hover:border-emerald-200 hover:shadow-lg"}`}>
+                <div key={surah.number} className={`group rounded-[24px] border p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 ${darkMode ? "border-slate-700 bg-slate-800 hover:border-slate-600 hover:shadow-slate-900/50" : "border-slate-200 bg-white hover:border-amber-200 hover:shadow-lg"}`}>
                   <div className="mb-5 flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <p className={`text-xs font-semibold uppercase tracking-[0.3em] transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-emerald-700"}`}>{surah.number}</p>
+                      <p className={`text-xs font-semibold uppercase tracking-[0.3em] transition-colors duration-200 ${darkMode ? "text-slate-400" : "text-amber-700"}`}>{surah.number}</p>
                       <h3 className={`mt-2 text-2xl font-bold leading-tight transition-colors duration-200 ${darkMode ? "text-slate-100" : "text-slate-900"}`}>{surahDisplayLanguage === "ar" ? surah.name : surah.englishName}</h3>
                     </div>
                     <div className="flex flex-col items-end gap-2">
@@ -503,7 +503,7 @@ export default function Home() {
                     <p className={`mt-4 text-xs uppercase tracking-[0.2em] transition-colors duration-200 ${darkMode ? "text-slate-500" : "text-slate-400"}`}>{surah.revelationType}</p>
 
                     {Number(readingProgress[surah.number] ?? 0) > 0 && (
-                      <div className={`mt-4 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold ${darkMode ? "border-emerald-700 bg-emerald-900/30 text-emerald-200" : "border-emerald-200 bg-emerald-50 text-emerald-800"}`}>
+                      <div className={`mt-4 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold ${darkMode ? "border-amber-700 bg-amber-900/30 text-amber-200" : "border-amber-200 bg-amber-50 text-amber-800"}`}>
                         📍 {language === "ar" ? `استئناف ${Number(readingProgress[surah.number] ?? 0) + 1}` : `Resume ${Number(readingProgress[surah.number] ?? 0) + 1}`}
                       </div>
                     )}

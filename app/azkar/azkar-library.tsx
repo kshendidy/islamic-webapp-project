@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type CategoryId = "morning" | "evening" | "prayer" | "bedtime" | "waking" | "daily";
 
@@ -986,6 +986,89 @@ export default function AzkarLibrary() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryId | "all">("all");
   const [query, setQuery] = useState("");
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [arabicVoices, setArabicVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoiceUri, setSelectedVoiceUri] = useState("default");
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [speechError, setSpeechError] = useState("");
+  const [speechNotice, setSpeechNotice] = useState("");
+
+  useEffect(() => {
+    if (!("speechSynthesis" in window)) {
+      const noticeTimer = globalThis.setTimeout(
+        () => setSpeechNotice("القراءة الصوتية غير مدعومة في هذا المتصفح."),
+        0,
+      );
+      return () => globalThis.clearTimeout(noticeTimer);
+    }
+
+    const synthesis = window.speechSynthesis;
+    const updateArabicVoices = () => {
+      const voices = synthesis.getVoices().filter((voice) => voice.lang.toLowerCase().startsWith("ar"));
+      setArabicVoices(voices);
+      setSpeechNotice(
+        voices.length === 0
+          ? "لا يتوفر صوت عربي مثبت؛ سيُستخدم صوت الجهاز الافتراضي وقد يختلف نطقه للعربية."
+          : "",
+      );
+      setSelectedVoiceUri((current) =>
+        current === "default" || voices.some((voice) => voice.voiceURI === current)
+          ? current
+          : voices[0]?.voiceURI ?? "default",
+      );
+    };
+
+    const voicesTimer = window.setTimeout(() => {
+      setIsSpeechSupported(true);
+      updateArabicVoices();
+    }, 0);
+    synthesis.addEventListener("voiceschanged", updateArabicVoices);
+
+    return () => {
+      window.clearTimeout(voicesTimer);
+      synthesis.removeEventListener("voiceschanged", updateArabicVoices);
+      synthesis.cancel();
+    };
+  }, []);
+
+  const playDhikr = (dhikr: Dhikr) => {
+    if (!isSpeechSupported) {
+      setSpeechError("القراءة الصوتية غير مدعومة في هذا المتصفح.");
+      return;
+    }
+
+    const voice = selectedVoiceUri === "default"
+      ? undefined
+      : arabicVoices.find((option) => option.voiceURI === selectedVoiceUri);
+    if (selectedVoiceUri !== "default" && !voice) {
+      setSpeechError("الصوت المحدد غير متاح الآن. اختر صوتًا آخر.");
+      return;
+    }
+
+    if (speakingId === dhikr.id) {
+      window.speechSynthesis.cancel();
+      setSpeakingId(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    setSpeechError("");
+    const text = dhikr.verses?.map((verse) => verse.text).join(" ") ?? dhikr.text;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = voice?.lang ?? "ar";
+    if (voice) utterance.voice = voice;
+    utterance.onstart = () => setSpeakingId(dhikr.id);
+    utterance.onend = () => setSpeakingId((current) => current === dhikr.id ? null : current);
+    utterance.onerror = (event) => {
+      setSpeakingId((current) => current === dhikr.id ? null : current);
+      if (event.error !== "interrupted" && event.error !== "canceled") {
+        setSpeechError("تعذرت قراءة الذكر صوتيًا. حاول اختيار صوت آخر.");
+      }
+    };
+
+    setSpeakingId(dhikr.id);
+    window.speechSynthesis.speak(utterance);
+  };
 
   const visibleCategories = selectedCategory === "all"
     ? categories
@@ -1009,17 +1092,17 @@ export default function AzkarLibrary() {
         <nav className="mb-6 flex items-center justify-between gap-4">
           <Link
             href="/"
-            className="rounded-full border border-emerald-200 bg-white/80 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-50"
+            className="rounded-full border border-amber-200 bg-white/80 px-4 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50"
           >
             ← العودة إلى القرآن
           </Link>
-          <span className="text-sm font-medium text-emerald-800">مستكشف القرآن</span>
+          <span className="text-sm font-medium text-amber-800">مستكشف القرآن</span>
         </nav>
 
-        <header className="mb-8 overflow-hidden rounded-[30px] border border-emerald-900/10 bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-800 p-7 text-white shadow-xl shadow-emerald-950/15 sm:p-10">
-          <p className="mb-3 text-sm font-semibold tracking-[0.18em] text-emerald-200">أذكار اليوم والليلة</p>
+        <header className="mb-8 overflow-hidden rounded-[30px] border border-amber-900/10 bg-gradient-to-br from-amber-950 via-amber-900 to-amber-800 p-7 text-white shadow-xl shadow-amber-950/15 sm:p-10">
+          <p className="mb-3 text-sm font-semibold tracking-[0.18em] text-amber-200">أذكار اليوم والليلة</p>
           <h1 className="text-4xl font-black tracking-tight sm:text-5xl">الأذكار</h1>
-          <p className="mt-4 max-w-2xl text-base leading-8 text-emerald-50 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base leading-8 text-amber-50 sm:text-lg">
             أكثر من مئة ذكر ودعاء للصباح والمساء وبعد الصلاة، مع قسمين منفصلين لما قبل النوم وما بعد الاستيقاظ، وأذكار لمواقف اليوم ومراجعها.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
@@ -1033,7 +1116,7 @@ export default function AzkarLibrary() {
               <button
                 type="button"
                 onClick={() => setCounts({})}
-                className="rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-emerald-50 transition hover:bg-white/10"
+                className="rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-white/10"
               >
                 إعادة العد
               </button>
@@ -1042,7 +1125,35 @@ export default function AzkarLibrary() {
         </header>
 
         <section className="mb-7 rounded-[24px] border border-slate-200 bg-white/85 p-4 shadow-sm backdrop-blur sm:p-5">
-          <label className="mb-4 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-100">
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+              <span>الصوت العربي</span>
+              <select
+                value={selectedVoiceUri}
+                onChange={(event) => setSelectedVoiceUri(event.target.value)}
+                disabled={!isSpeechSupported}
+                className="max-w-64 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                aria-label="اختر الصوت العربي"
+              >
+                <option value="default">صوت الجهاز الافتراضي</option>
+                {arabicVoices.map((voice) => (
+                  <option key={voice.voiceURI} value={voice.voiceURI}>
+                    {voice.name} ({voice.lang})
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="text-xs leading-6 text-slate-500">
+              قراءة آلية باستخدام أصوات جهازك، وليست تلاوة مسجلة. قد يختلف النطق حسب الصوت المختار.
+            </p>
+            {speechNotice && (
+              <p role="status" className="w-full text-sm text-amber-900">{speechNotice}</p>
+            )}
+            {speechError && (
+              <p role="status" className="w-full text-sm text-red-700">{speechError}</p>
+            )}
+          </div>
+          <label className="mb-4 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 focus-within:border-amber-400 focus-within:ring-2 focus-within:ring-amber-100">
             <span aria-hidden="true">⌕</span>
             <input
               type="search"
@@ -1058,7 +1169,7 @@ export default function AzkarLibrary() {
               type="button"
               onClick={() => setSelectedCategory("all")}
               aria-pressed={selectedCategory === "all"}
-              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${selectedCategory === "all" ? "border-emerald-800 bg-emerald-800 text-white" : "border-slate-200 bg-white text-slate-700 hover:border-emerald-300"}`}
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${selectedCategory === "all" ? "border-amber-800 bg-amber-800 text-white" : "border-slate-200 bg-white text-slate-700 hover:border-amber-300"}`}
             >
               الكل
             </button>
@@ -1068,7 +1179,7 @@ export default function AzkarLibrary() {
                 type="button"
                 onClick={() => setSelectedCategory(category.id)}
                 aria-pressed={selectedCategory === category.id}
-                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${selectedCategory === category.id ? "border-emerald-800 bg-emerald-800 text-white" : "border-slate-200 bg-white text-slate-700 hover:border-emerald-300"}`}
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${selectedCategory === category.id ? "border-amber-800 bg-amber-800 text-white" : "border-slate-200 bg-white text-slate-700 hover:border-amber-300"}`}
               >
                 {category.title}
               </button>
@@ -1098,11 +1209,11 @@ export default function AzkarLibrary() {
                     return (
                       <article
                         key={dhikr.id}
-                        className="rounded-[24px] border border-emerald-900/10 bg-white/90 p-5 shadow-sm shadow-emerald-950/5 sm:p-6"
+                        className="rounded-[24px] border border-amber-900/10 bg-white/90 p-5 shadow-sm shadow-amber-950/5 sm:p-6"
                       >
                         <div className="mb-4 flex items-start justify-between gap-4">
                           <div>
-                            <span className="text-xs font-bold tracking-wider text-emerald-700">
+                            <span className="text-xs font-bold tracking-wider text-amber-700">
                               {String(index + 1).padStart(2, "0")}
                             </span>
                             <h3 className="mt-1 text-lg font-bold text-slate-900">{dhikr.title}</h3>
@@ -1116,9 +1227,9 @@ export default function AzkarLibrary() {
                             {dhikr.verses.map((verse) => (
                               <p
                                 key={verse.number}
-                                className="text-right text-2xl leading-[2.1] text-emerald-950 sm:text-[1.7rem]"
+                                className="text-right text-2xl leading-[2.1] text-amber-950 sm:text-[1.7rem]"
                               >
-                                <span className="ml-2 inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-2 text-sm font-bold text-emerald-800">
+                                <span className="ml-2 inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-amber-200 bg-amber-50 px-2 text-sm font-bold text-amber-800">
                                   {verse.number.toLocaleString("ar-EG")}
                                 </span>
                                 {verse.text}
@@ -1126,16 +1237,16 @@ export default function AzkarLibrary() {
                             ))}
                           </div>
                         ) : (
-                          <p className="text-right text-2xl leading-[2.1] text-emerald-950 sm:text-[1.7rem]">
+                          <p className="text-right text-2xl leading-[2.1] text-amber-950 sm:text-[1.7rem]">
                             {dhikr.text}
                           </p>
                         )}
-                        <div className="mt-4 rounded-xl bg-emerald-50/80 p-4">
-                          <p className="text-xs font-bold text-emerald-800">الوصف بالعربية</p>
+                        <div className="mt-4 rounded-xl bg-amber-50/80 p-4">
+                          <p className="text-xs font-bold text-amber-800">الوصف بالعربية</p>
                           <p className="mt-1 text-sm leading-7 text-slate-700">
                             يُقال «{dhikr.title}» {descriptionOccasions[dhikr.category].ar}، وفق الصيغة الواردة في المصدر.
                           </p>
-                          <p dir="ltr" className="mt-3 text-left text-xs font-bold text-emerald-800">Description in English</p>
+                          <p dir="ltr" className="mt-3 text-left text-xs font-bold text-amber-800">Description in English</p>
                           <p dir="ltr" className="mt-1 text-left text-sm leading-7 text-slate-700">
                             {dhikr.meaning ?? `This remembrance is recited ${descriptionOccasions[dhikr.category].en}; follow the wording and context given in the cited source.`}
                           </p>
@@ -1147,18 +1258,29 @@ export default function AzkarLibrary() {
                         )}
                         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
                           <p className="text-xs leading-5 text-slate-500">المصدر: {dhikr.source}</p>
-                          <button
-                            type="button"
-                            onClick={() => setCounts((current) => ({
-                              ...current,
-                              [dhikr.id]: Math.min(dhikr.count, (current[dhikr.id] ?? 0) + 1),
-                            }))}
-                            disabled={isComplete}
-                            aria-label={`${dhikr.title}: ${currentCount} من ${dhikr.count}`}
-                            className={`min-w-28 rounded-full px-4 py-2 text-sm font-bold transition ${isComplete ? "bg-emerald-100 text-emerald-800" : "bg-emerald-800 text-white hover:bg-emerald-700"}`}
-                          >
-                            {isComplete ? "تم الورد ✓" : `${currentCount} / ${dhikr.count} · سَبِّح`}
-                          </button>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => playDhikr(dhikr)}
+                              disabled={!isSpeechSupported}
+                              aria-label={speakingId === dhikr.id ? `إيقاف قراءة ${dhikr.title}` : `استمع إلى ${dhikr.title}`}
+                              className="rounded-full border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-bold text-amber-900 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              {speakingId === dhikr.id ? "إيقاف الصوت ■" : "استمع ▶"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setCounts((current) => ({
+                                ...current,
+                                [dhikr.id]: Math.min(dhikr.count, (current[dhikr.id] ?? 0) + 1),
+                              }))}
+                              disabled={isComplete}
+                              aria-label={`${dhikr.title}: ${currentCount} من ${dhikr.count}`}
+                              className={`min-w-28 rounded-full px-4 py-2 text-sm font-bold transition ${isComplete ? "bg-amber-100 text-amber-800" : "bg-amber-800 text-white hover:bg-amber-700"}`}
+                            >
+                              {isComplete ? "تم الورد ✓" : `${currentCount} / ${dhikr.count} · سَبِّح`}
+                            </button>
+                          </div>
                         </div>
                       </article>
                     );
