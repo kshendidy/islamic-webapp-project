@@ -10,19 +10,20 @@ type Dhikr = {
   category: CategoryId;
   title: string;
   text: string;
+  verses?: { number: number; text: string }[];
   transliteration?: string;
   meaning?: string;
   count: number;
   source: string;
 };
 
-const categories: { id: CategoryId; title: string; description: string }[] = [
-  { id: "morning", title: "أذكار الصباح", description: "أذكار وأدعية الصباح الواردة في السنة، مع أعدادها ومصادرها." },
-  { id: "evening", title: "أذكار المساء", description: "أذكار وأدعية المساء الواردة في السنة، مع أعدادها ومصادرها." },
-  { id: "prayer", title: "بعد الصلاة", description: "الأذكار التي تقال بعد الصلوات المفروضة، وأذكار مخصوصة بعد الفجر." },
-  { id: "bedtime", title: "أذكار قبل النوم", description: "الأذكار والأدعية التي تقال عند إرادة النوم." },
-  { id: "waking", title: "أذكار بعد الاستيقاظ", description: "ما يقال عند الاستيقاظ صباحًا أو من نوم الليل." },
-  { id: "daily", title: "أذكار يومية", description: "أذكار المواقف المتكررة في اليوم: الطعام، السفر، المسجد، والشدائد وغيرها." },
+const categories: { id: CategoryId; title: string; description: string; descriptionEn: string }[] = [
+  { id: "morning", title: "أذكار الصباح", description: "أذكار وأدعية الصباح الواردة في السنة، مع أعدادها ومصادرها.", descriptionEn: "Prophetic morning remembrances and supplications, with repetition counts and sources." },
+  { id: "evening", title: "أذكار المساء", description: "أذكار وأدعية المساء الواردة في السنة، مع أعدادها ومصادرها.", descriptionEn: "Prophetic evening remembrances and supplications, with repetition counts and sources." },
+  { id: "prayer", title: "بعد الصلاة", description: "الأذكار التي تقال بعد الصلوات المفروضة، وأذكار مخصوصة بعد الفجر.", descriptionEn: "Remembrances after the obligatory prayers, including some specific to Fajr." },
+  { id: "bedtime", title: "أذكار قبل النوم", description: "الأذكار والأدعية التي تقال عند إرادة النوم.", descriptionEn: "Remembrances and supplications for before going to sleep." },
+  { id: "waking", title: "أذكار بعد الاستيقاظ", description: "ما يقال عند الاستيقاظ صباحًا أو من نوم الليل.", descriptionEn: "What to say when waking in the morning or during the night." },
+  { id: "daily", title: "أذكار يومية", description: "أذكار المواقف المتكررة في اليوم: الطعام، السفر، المسجد، والشدائد وغيرها.", descriptionEn: "Remembrances for everyday occasions such as eating, travel, the mosque, and hardship." },
 ];
 
 const azkar: Dhikr[] = [
@@ -717,11 +718,23 @@ const azkar: Dhikr[] = [
   {
     id: "wake-last-verses-imran",
     category: "waking",
-    title: "خواتيم سورة آل عمران عند القيام ليلًا",
-    text: "سورة آل عمران، الآيات ١٩٠–٢٠٠",
-    meaning: "The Prophet ﷺ woke during the night and recited these final ten verses.",
+    title: "العشر الآيات الأخيرة من سورة آل عمران",
+    text: "",
+    verses: [
+      { number: 191, text: "ٱلَّذِينَ يَذْكُرُونَ ٱللَّهَ قِيَٰمًۭا وَقُعُودًۭا وَعَلَىٰ جُنُوبِهِمْ وَيَتَفَكَّرُونَ فِى خَلْقِ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضِ رَبَّنَا مَا خَلَقْتَ هَٰذَا بَٰطِلًۭا سُبْحَٰنَكَ فَقِنَا عَذَابَ ٱلنَّارِ" },
+      { number: 192, text: "رَبَّنَآ إِنَّكَ مَن تُدْخِلِ ٱلنَّارَ فَقَدْ أَخْزَيْتَهُۥ ۖ وَمَا لِلظَّٰلِمِينَ مِنْ أَنصَارٍۢ" },
+      { number: 193, text: "رَّبَّنَآ إِنَّنَا سَمِعْنَا مُنَادِيًۭا يُنَادِى لِلْإِيمَٰنِ أَنْ ءَامِنُوا۟ بِرَبِّكُمْ فَـَٔامَنَّا ۚ رَبَّنَا فَٱغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّـَٔاتِنَا وَتَوَفَّنَا مَعَ ٱلْأَبْرَارِ" },
+      { number: 194, text: "رَبَّنَا وَءَاتِنَا مَا وَعَدتَّنَا عَلَىٰ رُسُلِكَ وَلَا تُخْزِنَا يَوْمَ ٱلْقِيَٰمَةِ ۗ إِنَّكَ لَا تُخْلِفُ ٱلْمِيعَادَ" },
+      { number: 195, text: "فَٱسْتَجَابَ لَهُمْ رَبُّهُمْ أَنِّى لَآ أُضِيعُ عَمَلَ عَٰمِلٍۢ مِّنكُم مِّن ذَكَرٍ أَوْ أُنثَىٰ ۖ بَعْضُكُم مِّنۢ بَعْضٍۢ ۖ فَٱلَّذِينَ هَاجَرُوا۟ وَأُخْرِجُوا۟ مِن دِيَٰرِهِمْ وَأُوذُوا۟ فِى سَبِيلِى وَقَٰتَلُوا۟ وَقُتِلُوا۟ لَأُكَفِّرَنَّ عَنْهُمْ سَيِّـَٔاتِهِمْ وَلَأُدْخِلَنَّهُمْ جَنَّٰتٍۢ تَجْرِى مِن تَحْتِهَا ٱلْأَنْهَٰرُ ثَوَابًۭا مِّنْ عِندِ ٱللَّهِ ۗ وَٱللَّهُ عِندَهُۥ حُسْنُ ٱلثَّوَابِ" },
+      { number: 196, text: "لَا يَغُرَّنَّكَ تَقَلُّبُ ٱلَّذِينَ كَفَرُوا۟ فِى ٱلْبِلَٰدِ" },
+      { number: 197, text: "مَتَٰعٌۭ قَلِيلٌۭ ثُمَّ مَأْوَىٰهُمْ جَهَنَّمُ ۚ وَبِئْسَ ٱلْمِهَادُ" },
+      { number: 198, text: "لَٰكِنِ ٱلَّذِينَ ٱتَّقَوْا۟ رَبَّهُمْ لَهُمْ جَنَّٰتٌۭ تَجْرِى مِن تَحْتِهَا ٱلْأَنْهَٰرُ خَٰلِدِينَ فِيهَا نُزُلًۭا مِّنْ عِندِ ٱللَّهِ ۗ وَمَا عِندَ ٱللَّهِ خَيْرٌۭ لِّلْأَبْرَارِ" },
+      { number: 199, text: "وَإِنَّ مِنْ أَهْلِ ٱلْكِتَٰبِ لَمَن يُؤْمِنُ بِٱللَّهِ وَمَآ أُنزِلَ إِلَيْكُمْ وَمَآ أُنزِلَ إِلَيْهِمْ خَٰشِعِينَ لِلَّهِ لَا يَشْتَرُونَ بِـَٔايَٰتِ ٱللَّهِ ثَمَنًۭا قَلِيلًا ۗ أُو۟لَٰٓئِكَ لَهُمْ أَجْرُهُمْ عِندَ رَبِّهِمْ ۗ إِنَّ ٱللَّهَ سَرِيعُ ٱلْحِسَابِ" },
+      { number: 200, text: "يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ ٱصْبِرُوا۟ وَصَابِرُوا۟ وَرَابِطُوا۟ وَٱتَّقُوا۟ ٱللَّهَ لَعَلَّكُمْ تُفْلِحُونَ" },
+    ],
+    meaning: "These are verses 191–200, the final ten verses of Aal-Imran. The Prophet ﷺ recited them when waking during the night.",
     count: 1,
-    source: "القرآن الكريم، سورة آل عمران: ١٩٠–٢٠٠؛ صحيح البخاري 183، وصحيح مسلم 763",
+    source: "القرآن الكريم، سورة آل عمران: ١٩١–٢٠٠؛ صحيح البخاري 183، وصحيح مسلم 763",
   },
   {
     id: "wake-night-prayer",
@@ -960,6 +973,15 @@ const azkar: Dhikr[] = [
   },
 ];
 
+const descriptionOccasions: Record<CategoryId, { ar: string; en: string }> = {
+  morning: { ar: "في الصباح", en: "in the morning" },
+  evening: { ar: "في المساء", en: "in the evening" },
+  prayer: { ar: "بعد الصلاة", en: "after prayer" },
+  bedtime: { ar: "قبل النوم", en: "before sleep" },
+  waking: { ar: "بعد الاستيقاظ", en: "after waking" },
+  daily: { ar: "في الموقف المذكور في عنوانه", en: "for the occasion named in its title" },
+};
+
 export default function AzkarLibrary() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryId | "all">("all");
   const [query, setQuery] = useState("");
@@ -973,7 +995,8 @@ export default function AzkarLibrary() {
     const searchTerm = query.trim().toLocaleLowerCase();
     return azkar.filter((dhikr) => {
       const matchesCategory = selectedCategory === "all" || dhikr.category === selectedCategory;
-      const searchableText = `${dhikr.title} ${dhikr.text} ${dhikr.transliteration ?? ""} ${dhikr.meaning ?? ""} ${dhikr.source}`.toLocaleLowerCase();
+      const verseText = dhikr.verses?.map((verse) => verse.text).join(" ") ?? "";
+      const searchableText = `${dhikr.title} ${dhikr.text} ${verseText} ${dhikr.transliteration ?? ""} ${dhikr.meaning ?? ""} ${dhikr.source}`.toLocaleLowerCase();
       return matchesCategory && (!searchTerm || searchableText.includes(searchTerm));
     });
   }, [query, selectedCategory]);
@@ -1065,6 +1088,7 @@ export default function AzkarLibrary() {
                     {category.title}
                   </h2>
                   <p className="mt-1 text-sm leading-6 text-slate-600">{category.description}</p>
+                  <p dir="ltr" className="mt-1 text-left text-sm leading-6 text-slate-600">{category.descriptionEn}</p>
                 </div>
                 <div className="grid gap-4 lg:grid-cols-2">
                   {categoryAzkar.map((dhikr, index) => {
@@ -1087,17 +1111,38 @@ export default function AzkarLibrary() {
                             {dhikr.count === 1 ? "مرة واحدة" : `${dhikr.count} مرات`}
                           </span>
                         </div>
-                        <p className="text-right text-2xl leading-[2.1] text-emerald-950 sm:text-[1.7rem]">
-                          {dhikr.text}
-                        </p>
+                        {dhikr.verses ? (
+                          <div className="space-y-4">
+                            {dhikr.verses.map((verse) => (
+                              <p
+                                key={verse.number}
+                                className="text-right text-2xl leading-[2.1] text-emerald-950 sm:text-[1.7rem]"
+                              >
+                                <span className="ml-2 inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-2 text-sm font-bold text-emerald-800">
+                                  {verse.number.toLocaleString("ar-EG")}
+                                </span>
+                                {verse.text}
+                              </p>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-right text-2xl leading-[2.1] text-emerald-950 sm:text-[1.7rem]">
+                            {dhikr.text}
+                          </p>
+                        )}
+                        <div className="mt-4 rounded-xl bg-emerald-50/80 p-4">
+                          <p className="text-xs font-bold text-emerald-800">الوصف بالعربية</p>
+                          <p className="mt-1 text-sm leading-7 text-slate-700">
+                            يُقال «{dhikr.title}» {descriptionOccasions[dhikr.category].ar}، وفق الصيغة الواردة في المصدر.
+                          </p>
+                          <p dir="ltr" className="mt-3 text-left text-xs font-bold text-emerald-800">Description in English</p>
+                          <p dir="ltr" className="mt-1 text-left text-sm leading-7 text-slate-700">
+                            {dhikr.meaning ?? `This remembrance is recited ${descriptionOccasions[dhikr.category].en}; follow the wording and context given in the cited source.`}
+                          </p>
+                        </div>
                         {dhikr.transliteration && (
                           <p dir="ltr" className="mt-4 text-left text-sm leading-6 text-slate-600">
                             {dhikr.transliteration}
-                          </p>
-                        )}
-                        {dhikr.meaning && (
-                          <p dir="ltr" className="mt-3 text-left text-sm leading-6 text-slate-600">
-                            {dhikr.meaning}
                           </p>
                         )}
                         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
