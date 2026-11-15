@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { quranStories } from "./stories";
+import { getStoryVideoSearchUrl, quranStories } from "./stories";
 
 type Language = "ar" | "en";
 
@@ -56,8 +56,8 @@ export default function QuranStoriesLibrary() {
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-8 text-amber-50 sm:text-lg">
             {isArabic
-              ? "قصص قرآنية مبسطة للصغار، مع مواضعها في القرآن وعبرة من كل قصة. لا تُصوَّر الأنبياء في الرسوم هنا."
-              : "Child-friendly summaries of major Quranic stories, with Quran references and a lesson from each. The videos linked here should not depict prophets."}
+              ? "قصص قرآنية مبسطة للصغار، مع مواضعها في القرآن وعبرة من كل قصة. روابط الفيديو تبحث عن محتوى يطلب عدم تجسيد الأنبياء واستخدام النور بدلًا من ذلك."
+              : "Child-friendly summaries of Quranic stories, with Quran references and a lesson from each. Video search links request no depiction of prophets and light-only imagery."}
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm">
@@ -79,14 +79,14 @@ export default function QuranStoriesLibrary() {
 
         <aside className="mb-8 rounded-2xl border border-amber-200 bg-amber-50/90 p-5 text-sm leading-7 text-amber-950">
           {isArabic
-            ? "يفتح كل زر فيديو مباشرًا على YouTube خارج الموقع. راجعوا الفيديو مع ولي الأمر؛ لم نتحقق من ملاءمة كل المشاهد للأطفال أو من ظهور الأنبياء أو جنس الراوي. السرد المكتوب تلخيص تعليمي، والمرجع هو الآيات المذكورة."
-            : "Each button opens a direct YouTube video outside this site. Please review it with a parent; we have not verified every scene for children, whether prophets are depicted, or the narrator's gender. The written stories are educational summaries; the cited verses are the source."}
+            ? "تفتح الروابط نتائج بحث على YouTube ولا تشغّل فيديو تلقائيًا. البحث يطلب عدم تجسيد الأنبياء واستخدام النور فقط، لكننا لا نتحكم في نتائج YouTube؛ راجعوا الفيديو قبل تشغيله. السرد المكتوب تلخيص تعليمي، والمرجع هو الآيات المذكورة."
+            : "Links open YouTube search results rather than playing a video automatically. The search requests no depiction of prophets and light-only imagery, but YouTube controls its results; review a video before playing it. The written stories are educational summaries; the cited verses are the source."}
         </aside>
 
         <div className="grid gap-5 md:grid-cols-2">
           {visibleStories.map((story, index) => {
             const title = isArabic ? story.titleAr : story.titleEn;
-            const videoUrl = `https://www.youtube.com/watch?v=${story.videoId}`;
+            const videoUrl = getStoryVideoSearchUrl(story, language);
             return (
               <article
                 key={story.id}
@@ -136,7 +136,7 @@ export default function QuranStoriesLibrary() {
                       rel="noreferrer"
                       className="inline-flex rounded-full border border-amber-300 bg-amber-50 px-5 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800"
                     >
-                      {isArabic ? "شاهد الفيديو ▶" : "Watch video ▶"}
+                      {isArabic ? "ابحث عن فيديو مناسب ▶" : "Search for a suitable video ▶"}
                     </a>
                   </div>
                 </div>

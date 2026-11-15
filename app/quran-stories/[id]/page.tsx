@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { quranStories } from "../stories";
+import { getStoryVideoSearchUrl, quranStories } from "../stories";
 import { quranStoryNarratives } from "../narratives";
 
 type Language = "ar" | "en";
@@ -89,7 +89,7 @@ function StoryDetail({
   );
 
   const isArabic = language === "ar";
-  const videoUrl = `https://www.youtube.com/watch?v=${story.videoId}`;
+  const videoUrl = getStoryVideoSearchUrl(story, language);
   const storyIndex = quranStories.findIndex((item) => item.id === story.id);
   const previousStory = quranStories[storyIndex - 1];
   const nextStory = quranStories[storyIndex + 1];
@@ -305,7 +305,7 @@ function StoryDetail({
             rel="noreferrer"
             className="mt-7 inline-flex rounded-full border border-amber-300 bg-amber-50 px-5 py-2.5 text-sm font-bold text-amber-900 transition hover:bg-amber-100"
           >
-            {isArabic ? "شاهد فيديو القصة على YouTube ▶" : "Watch the story video on YouTube ▶"}
+            {isArabic ? "ابحث عن فيديو مناسب على YouTube ▶" : "Search YouTube for a suitable video ▶"}
           </a>
         </article>
         <nav aria-label={isArabic ? "التنقل بين القصص" : "Story navigation"} className="mt-5 flex items-center justify-between gap-3">

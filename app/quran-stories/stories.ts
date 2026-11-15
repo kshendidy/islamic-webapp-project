@@ -7,8 +7,17 @@ export type QuranStory = {
   lessonAr: string;
   lessonEn: string;
   references: string[];
-  videoId: string;
 };
+
+export function getStoryVideoSearchUrl(
+  story: Pick<QuranStory, "titleAr" | "titleEn">,
+  language: "ar" | "en",
+) {
+  const query = language === "ar"
+    ? `${story.titleAr} قصة بدون تجسيد الأنبياء نور فقط`
+    : `${story.titleEn} story no depiction of prophets light only`;
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+}
 
 export const quranStories: QuranStory[] = [
   {
@@ -20,7 +29,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "إذا أخطأنا، نتوب إلى الله ولا نيأس من رحمته.",
     lessonEn: "When we make a mistake, we can repent and never despair of Allah's mercy.",
     references: ["البقرة 2:30–39", "الأعراف 7:11–27", "طه 20:115–123"],
-    videoId: "lKpuxb6Xh7E",
   },
   {
     id: "nuh",
@@ -31,7 +39,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "نصبر على فعل الخير، ونثق بالله ونتبع هديه.",
     lessonEn: "Be patient in doing what is right, trust Allah, and follow His guidance.",
     references: ["هود 11:25–49", "المؤمنون 23:23–30", "نوح 71:1–28", "العنكبوت 29:14", "القمر 54:9–15"],
-    videoId: "PBnqOqjmSEU",
   },
   {
     id: "hud",
@@ -42,7 +49,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "القوة نعمة من الله، فلا ينبغي أن تقودنا إلى الكبر.",
     lessonEn: "Strength is a gift from Allah and should never lead to arrogance.",
     references: ["الأعراف 7:65–72", "هود 11:50–60", "الأحقاف 46:21–26", "الفجر 89:6–8", "الحاقة 69:6–8"],
-    videoId: "ILJm8EdN1WY",
   },
   {
     id: "salih",
@@ -53,7 +59,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "نحترم آيات الله ولا نؤذي خلقه.",
     lessonEn: "Respect Allah's signs and do not harm His creation.",
     references: ["الأعراف 7:73–79", "هود 11:61–68", "النمل 27:45–53", "القمر 54:23–31", "الشمس 91:11–15"],
-    videoId: "mBwwSMx7rCE",
   },
   {
     id: "ibrahim",
@@ -64,7 +69,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "الثقة بالله والطاعة والصبر من أعظم الأعمال.",
     lessonEn: "Trusting Allah, obeying Him, and being patient are among the greatest deeds.",
     references: ["البقرة 2:124–129", "الأنعام 6:74–83", "هود 11:69–76", "مريم 19:41–50", "العنكبوت 29:26–27", "الأنبياء 21:51–73", "الصافات 37:99–111"],
-    videoId: "wXvZTPaLeEo",
   },
   {
     id: "lut",
@@ -75,7 +79,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "نختار الطاعة والخلق الحسن، ونبتعد عن إيذاء الآخرين.",
     lessonEn: "Choose obedience and good character, and never harm others.",
     references: ["الأعراف 7:80–84", "هود 11:77–83", "الحجر 15:57–77", "الشعراء 26:160–175", "العنكبوت 29:28–35"],
-    videoId: "oMxh9bnhYR4",
   },
   {
     id: "shuayb",
@@ -86,7 +89,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "الأمانة والعدل واجبان في البيع وفي كل تعامل.",
     lessonEn: "Honesty and fairness matter in business and in every interaction.",
     references: ["الأعراف 7:85–93", "هود 11:84–95", "الشعراء 26:176–191"],
-    videoId: "5hI4Qn-y7ZY",
   },
   {
     id: "yusuf",
@@ -97,7 +99,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "مع الصبر والعفة والعفو يأتي الفرج بإذن الله.",
     lessonEn: "With patience, integrity, and forgiveness, relief can come by Allah's permission.",
     references: ["يوسف 12:4–101"],
-    videoId: "D64fHVdk6Bo",
   },
   {
     id: "ayyub",
@@ -108,7 +109,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "ندعو الله في الشدة ونصبر، فالله رحيم بعباده.",
     lessonEn: "Call upon Allah in hardship and remain patient; Allah is merciful to His servants.",
     references: ["الأنبياء 21:83–84", "ص 38:41–44"],
-    videoId: "VOGix2OoxU4",
   },
   {
     id: "musa",
@@ -119,7 +119,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "لا نخاف من الظلم، ونتوكل على الله ونتبع الحق.",
     lessonEn: "Do not give in to oppression; trust Allah and stand with what is right.",
     references: ["البقرة 2:57–60", "الأعراف 7:103–160", "طه 20:9–79", "الشعراء 26:10–68", "القصص 28:3–46", "يونس 10:75–92", "المائدة 5:20–26"],
-    videoId: "zci8etgyad8",
   },
   {
     id: "musa-khidr",
@@ -130,7 +129,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "نتواضع في طلب العلم، ونتذكر أن علم الله أوسع من علمنا.",
     lessonEn: "Be humble when seeking knowledge and remember that Allah knows more than we do.",
     references: ["الكهف 18:60–82"],
-    videoId: "hMYK-D1tf1w",
   },
   {
     id: "talut",
@@ -141,7 +139,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "النصر من عند الله، وليس بكثرة العدد وحدها.",
     lessonEn: "Victory comes from Allah; it is not determined by numbers alone.",
     references: ["البقرة 2:246–251"],
-    videoId: "1vGcFKP7VvE",
   },
   {
     id: "sulayman",
@@ -152,7 +149,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "نستخدم ما أنعم الله به علينا في الخير، ونبحث عن الحق بتواضع.",
     lessonEn: "Use Allah's gifts for good and seek the truth with humility.",
     references: ["النمل 27:15–44", "سبأ 34:12–14", "ص 38:30–40"],
-    videoId: "mgUnGncX3fM",
   },
   {
     id: "yunus",
@@ -163,7 +159,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "لا نيأس من رحمة الله، ونلجأ إليه بالدعاء والتوبة.",
     lessonEn: "Never despair of Allah's mercy; turn to Him with prayer and repentance.",
     references: ["الأنبياء 21:87–88", "الصافات 37:139–148", "القلم 68:48–50"],
-    videoId: "M1veaJ81bo4",
   },
   {
     id: "zakariya-yahya",
@@ -174,7 +169,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "الدعاء باب رجاء، وبر الوالدين من صفات الصالحين.",
     lessonEn: "Prayer is a door of hope, and kindness to parents is a quality of the righteous.",
     references: ["آل عمران 3:38–41", "مريم 19:2–15", "الأنبياء 21:89–90"],
-    videoId: "HqUpJIAtez4",
   },
   {
     id: "maryam-isa",
@@ -185,7 +179,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "الله قادر على كل شيء، ومريم مثال للعفة والثقة بالله.",
     lessonEn: "Allah has power over all things, and Maryam is an example of purity and trust in Him.",
     references: ["آل عمران 3:35–55", "مريم 19:16–36", "المائدة 5:110–115"],
-    videoId: "bBCACL8t5vs",
   },
   {
     id: "cave",
@@ -196,7 +189,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "نتمسك بالإيمان، ونصاحب من يعيننا على الخير.",
     lessonEn: "Hold firmly to faith and keep company with people who help you do good.",
     references: ["الكهف 18:9–26"],
-    videoId: "lROXHK0oaKo",
   },
   {
     id: "dhul-qarnayn",
@@ -207,7 +199,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "نستخدم القوة والمهارة لخدمة الناس، وننسب النعمة إلى الله.",
     lessonEn: "Use strength and skill to help people, and remember that blessings come from Allah.",
     references: ["الكهف 18:83–98"],
-    videoId: "ERIwlq4No64",
   },
   {
     id: "qarun",
@@ -218,7 +209,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "المال أمانة، والشكر والتواضع خير من التفاخر.",
     lessonEn: "Wealth is a trust; gratitude and humility are better than showing off.",
     references: ["القصص 28:76–82", "العنكبوت 29:39"],
-    videoId: "7K43yXu0S28",
   },
   {
     id: "garden",
@@ -229,7 +219,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "نشكر الله على النعم ونشارك المحتاجين مما رزقنا.",
     lessonEn: "Thank Allah for blessings and share with those in need.",
     references: ["القلم 68:17–33"],
-    videoId: "KnnYCtFDBdE",
   },
   {
     id: "sabbath",
@@ -240,7 +229,6 @@ export const quranStories: QuranStory[] = [
     lessonAr: "الطاعة الصادقة تكون بترك الحيلة على أوامر الله.",
     lessonEn: "True obedience means not trying to trick our way around Allah's commands.",
     references: ["الأعراف 7:163–166"],
-    videoId: "sLZsDI-cIAs",
   },
   {
     id: "elephant",
@@ -251,6 +239,5 @@ export const quranStories: QuranStory[] = [
     lessonAr: "الله يحفظ ما يشاء، فلا نتكبر بقوتنا.",
     lessonEn: "Allah protects what He wills; we should never be arrogant about our strength.",
     references: ["الفيل 105:1–5"],
-    videoId: "SMDEeb5qhBc",
   },
 ];
