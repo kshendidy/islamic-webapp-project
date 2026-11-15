@@ -76,10 +76,9 @@ export default function SurahPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedTafsir, setSelectedTafsir] = useState<{ayahNumber: number; tafsirText: string} | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [pageDirection, setPageDirection] = useState<"next" | "prev" | null>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const surahAudioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRequestIdRef = useRef(0);
   const readingProgressKey = "quran-reading-progress";
   const lastReadKey = "quran-last-read";
 
@@ -176,9 +175,28 @@ export default function SurahPage() {
     return pages;
   }, [surah]);
 
-  const currentPageVerses = pagesData[currentPage] || [];
   const totalPages = pagesData.length;
   const hasReadingMarker = currentPage > 0;
+
+  useEffect(() => {
+    if (!surah) return;
+
+    const pageElements = document.querySelectorAll<HTMLElement>("[data-quran-page]");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visiblePage = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        const pageIndex = Number(visiblePage?.target.getAttribute("data-page-index"));
+
+        if (Number.isInteger(pageIndex)) setCurrentPage(pageIndex);
+      },
+      { rootMargin: "-35% 0px -35% 0px" },
+    );
+
+    pageElements.forEach((page) => observer.observe(page));
+    return () => observer.disconnect();
+  }, [surah]);
 
   useEffect(() => {
     if (!surah || !mounted || totalPages === 0) return;
@@ -188,6 +206,14 @@ export default function SurahPage() {
 
     if (Number.isFinite(savedPage) && savedPage >= 0 && savedPage < totalPages) {
       setCurrentPage(savedPage);
+      if (savedPage > 0) {
+        window.requestAnimationFrame(() => {
+          document.getElementById(`quran-page-${savedPage}`)?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        });
+      }
     }
   }, [mounted, surah, surahNumber, totalPages]);
 
@@ -204,46 +230,33 @@ export default function SurahPage() {
     }));
   }, [currentPage, mounted, surah, surahNumber]);
 
-  const handlePrevPage = () => {
-    if (currentPage === 0) return;
-    setPageDirection("prev");
-    setIsAnimating(true);
-    window.setTimeout(() => {
-      setCurrentPage((p) => Math.max(0, p - 1));
-      setIsAnimating(false);
-      setPageDirection(null);
-    }, 180);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage >= totalPages - 1) return;
-    setPageDirection("next");
-    setIsAnimating(true);
-    window.setTimeout(() => {
-      setCurrentPage((p) => Math.min(totalPages - 1, p + 1));
-      setIsAnimating(false);
-      setPageDirection(null);
-    }, 180);
-  };
-
   const playAyahAudio = async (ayahNumber: number) => {
+    const requestId = ++audioRequestIdRef.current;
+    surahAudioRef.current?.pause();
+    audioRef.current?.pause();
+
     try {
       const response = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/ar.alafasy`);
       if (!response.ok) return;
 
       const result = await response.json();
       const src = result?.data?.audio;
-      if (!src) return;
+      if (!src || requestId !== audioRequestIdRef.current) return;
 
       const audio = audioRef.current ?? new Audio();
+      audioRef.current = audio;
       audio.src = src;
       audio.load();
       audio.currentTime = 0;
       await audio.play();
-      audioRef.current = audio;
     } catch (error) {
       console.error("Unable to play verse audio:", error);
     }
+  };
+
+  const stopAyahAudio = () => {
+    audioRequestIdRef.current += 1;
+    audioRef.current?.pause();
   };
 
   const renderAyahText = (ayah: Ayah) => {
@@ -256,19 +269,6 @@ export default function SurahPage() {
         </button>
       </>
     );
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.touches[0].clientX);
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStart === null) return;
-
-    const diff = touchStart - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 60) {
-      if ((diff > 0 && language === "ar") || (diff < 0 && language === "en")) handlePrevPage();
-      else handleNextPage();
-    }
-
-    setTouchStart(null);
   };
 
   if (!mounted || isLoading) {
@@ -316,7 +316,13 @@ export default function SurahPage() {
 
         {/* Audio */}
         <section className={`mb-8 rounded-2xl border p-6 ${darkMode ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-white"}`}>
-          <audio controls className="w-full" src={`https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`} />
+          <audio
+            ref={surahAudioRef}
+            controls
+            className="w-full"
+            src={`https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`}
+            onPlay={stopAyahAudio}
+          />
         </section>
 
         {hasReadingMarker && (
@@ -325,44 +331,31 @@ export default function SurahPage() {
           </div>
         )}
 
-        {/* Book Pages */}
-        <section
-          className={`mb-8 rounded-[28px] border px-5 py-4 min-h-[560px] flex flex-col justify-center transition-all ${darkMode ? "border-amber-800/60 bg-slate-800" : "border-amber-300 bg-gradient-to-b from-amber-50 via-amber-50 to-white"}`}
-          style={
-            darkMode
-              ? {
-                  boxShadow: "0 24px 80px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(251,191,36,0.18), inset 0 0 30px rgba(15,23,42,0.9)",
-                }
-              : {
-                  boxShadow: "0 26px 70px rgba(120, 84, 20, 0.18), inset 0 0 0 1px rgba(192,132,42,0.28), inset 0 0 30px rgba(255,255,255,0.8)",
-                }
-          }
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div className="relative overflow-hidden rounded-[22px] border border-amber-300/50" style={{ perspective: "1600px", background: darkMode ? "linear-gradient(180deg, rgba(15,23,42,0.96), rgba(30,41,59,0.98))" : "linear-gradient(180deg, rgba(255,255,255,0.62), rgba(255,248,220,0.82))" }}>
-            <div className="pointer-events-none absolute inset-0 rounded-[22px]" style={{ background: darkMode ? "linear-gradient(90deg, rgba(251,191,36,0.10), transparent 12%, transparent 88%, rgba(251,191,36,0.10)), linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))" : "linear-gradient(90deg, rgba(146,64,14,0.08), transparent 12%, transparent 88%, rgba(146,64,14,0.08)), linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1))" }} />
-            <div
-              className="relative transition-all duration-500 ease-out"
+        {/* Quran pages in continuous vertical reading order */}
+        <div className="mb-8 space-y-6">
+          {pagesData.map((pageVerses, pageIndex) => (
+            <section
+              key={pageIndex}
+              id={`quran-page-${pageIndex}`}
+              data-quran-page
+              data-page-index={pageIndex}
+              aria-label={`${currentText.page} ${pageIndex + 1} ${currentText.of} ${totalPages}`}
+              className={`scroll-mt-24 rounded-[28px] border px-5 py-6 sm:px-8 sm:py-8 ${darkMode ? "border-amber-800/60 bg-slate-800" : "border-amber-300 bg-gradient-to-b from-amber-50 via-amber-50 to-white"}`}
               style={
-                isAnimating
+                darkMode
                   ? {
-                      transform:
-                        pageDirection === "next"
-                          ? "perspective(1600px) rotateY(-8deg) translateX(12px) scale(0.99)"
-                          : "perspective(1600px) rotateY(8deg) translateX(-12px) scale(0.99)",
-                      opacity: 0.92,
-                      transformOrigin: language === "ar" ? "right center" : "left center",
+                      boxShadow: "0 24px 80px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(251,191,36,0.18), inset 0 0 30px rgba(15,23,42,0.9)",
                     }
                   : {
-                      transform: "perspective(1600px) rotateY(0deg) translateX(0px)",
-                      opacity: 1,
+                      boxShadow: "0 26px 70px rgba(120, 84, 20, 0.18), inset 0 0 0 1px rgba(192,132,42,0.28), inset 0 0 30px rgba(255,255,255,0.8)",
                     }
               }
-              dir={surahDisplayLanguage === "ar" ? "rtl" : "ltr"}
             >
-              <div className="space-y-0 py-4 px-2 sm:px-3">
-                {currentPageVerses.map((ayah) => (
+              <p className={`mb-5 text-center text-xs font-medium ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
+                {currentText.page} {pageIndex + 1} / {totalPages}
+              </p>
+              <div dir={surahDisplayLanguage === "ar" ? "rtl" : "ltr"} className="space-y-1">
+                {pageVerses.map((ayah) => (
                   <div key={ayah.numberInSurah} className="py-0">
                     <p className={`text-[1.6rem] sm:text-[1.8rem] leading-[1.65] font-medium text-center tracking-tight ${darkMode ? "text-slate-100" : "text-slate-900"}`} dir={surahDisplayLanguage === "ar" ? "rtl" : "ltr"}>
                       {renderAyahText(ayah)}
@@ -377,15 +370,9 @@ export default function SurahPage() {
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
-
-          <div className="mt-8 pt-4 border-t border-slate-400/30 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <button onClick={handlePrevPage} disabled={currentPage === 0} className={`px-5 py-2 rounded-full font-medium ${currentPage === 0 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-amber-100 text-amber-800 hover:bg-amber-200")}`}>{currentText.previous}</button>
-            <span className={`text-xs sm:text-sm font-medium ${darkMode ? "text-slate-400" : "text-slate-600"}`}>{currentText.page} {currentPage + 1} / {totalPages}</span>
-            <button onClick={handleNextPage} disabled={currentPage === totalPages - 1} className={`px-5 py-2 rounded-full font-medium ${currentPage === totalPages - 1 ? (darkMode ? "bg-slate-700 text-slate-500 cursor-not-allowed" : "bg-slate-200 text-slate-400 cursor-not-allowed") : (darkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-amber-100 text-amber-800 hover:bg-amber-200")}`}>{currentText.next}</button>
-          </div>
-        </section>
+            </section>
+          ))}
+        </div>
 
         {/* Navigation */}
         <div className="flex flex-wrap gap-3 justify-center">
