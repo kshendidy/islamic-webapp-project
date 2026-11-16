@@ -378,6 +378,12 @@ export default function Home() {
                 الأحاديث
               </Link>
               <Link
+                href="/qibla"
+                className={`rounded-full border px-4 py-2 font-semibold transition ${darkMode ? "border-amber-700 bg-amber-900/50 text-amber-200 hover:bg-amber-900" : "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"}`}
+              >
+                اتجاه القبلة
+              </Link>
+              <Link
                 href="/quran-stories"
                 className={`rounded-full border px-4 py-2 font-semibold transition ${darkMode ? "border-amber-700 bg-amber-900/50 text-amber-200 hover:bg-amber-900" : "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"}`}
               >
