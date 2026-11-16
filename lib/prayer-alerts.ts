@@ -172,7 +172,8 @@ export function getPublicVapidKey() {
     !process.env.VAPID_SUBJECT ||
     !process.env.UPSTASH_REDIS_REST_URL ||
     !process.env.UPSTASH_REDIS_REST_TOKEN ||
-    !process.env.CRON_SECRET
+    !process.env.QSTASH_CURRENT_SIGNING_KEY ||
+    !process.env.QSTASH_NEXT_SIGNING_KEY
   ) {
     throw new PrayerAlertError("Prayer notifications are not configured yet.", 503);
   }
@@ -183,7 +184,7 @@ function getVapidConfig() {
   const publicKey = process.env.VAPID_PUBLIC_KEY;
   const privateKey = process.env.VAPID_PRIVATE_KEY;
   const subject = process.env.VAPID_SUBJECT;
-  if (!publicKey || !privateKey || !subject || !process.env.CRON_SECRET) {
+  if (!publicKey || !privateKey || !subject) {
     throw new PrayerAlertError("Prayer notifications are not configured yet.", 503);
   }
   return { publicKey, privateKey, subject };
