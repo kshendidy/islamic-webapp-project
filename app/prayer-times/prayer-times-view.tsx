@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import PrayerAlertControls from "./prayer-alert-controls";
 
 type Language = "ar" | "en";
 type PrayerKey = "Fajr" | "Dhuhr" | "Asr" | "Maghrib" | "Isha";
@@ -305,8 +306,8 @@ export default function PrayerTimesView() {
 
         <aside className="mb-6 rounded-2xl border border-amber-200 bg-amber-50/90 p-4 text-sm leading-7 text-amber-950">
           {isArabic
-            ? "تُرسل إحداثيات موقعك إلى خدمة AlAdhan لجلب المواقيت، ولا نحفظها على خادمنا. قد تختلف النتائج قليلًا حسب طريقة الحساب وإعدادات المسجد المحلي."
-            : "Your coordinates are sent to AlAdhan to fetch prayer times; we do not store them on our server. Results may vary by calculation method and local mosque settings."}
+            ? "تُرسل إحداثيات موقعك إلى خدمة AlAdhan لجلب المواقيت. إذا فعّلت الإشعارات ووافقت، تُحفظ إحداثيات مقربة واشتراك الإشعارات في Upstash لجدولة التنبيهات، ويمكن حذفها بإيقاف الإشعارات. قد تختلف النتائج حسب طريقة الحساب وإعدادات المسجد المحلي."
+            : "Your coordinates are sent to AlAdhan for prayer times. If you enable notifications and consent, rounded coordinates and your push subscription are stored in Upstash to schedule alerts; disabling notifications removes them. Results may vary by calculation method and local mosque settings."}
         </aside>
 
         <section className="mb-6 rounded-[24px] border border-amber-900/10 bg-white/90 p-5 shadow-sm sm:p-6">
@@ -510,6 +511,17 @@ export default function PrayerTimesView() {
               {isArabic ? `المنطقة الزمنية: ${prayerDay.meta.timezone}` : `Time zone: ${prayerDay.meta.timezone}`}
             </p>
           </>
+        )}
+
+        {position && prayerDay && (
+          <PrayerAlertControls
+            position={position}
+            timings={prayerDay.timings}
+            timezone={prayerDay.meta.timezone}
+            method={method}
+            school={madhab}
+            language={language}
+          />
         )}
 
         <footer className="mt-10 border-t border-amber-900/10 py-6 text-center text-sm text-slate-600">
